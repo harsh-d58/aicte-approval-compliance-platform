@@ -1,0 +1,100 @@
+.statsBar {
+  padding: 1.5rem 0;
+  background: #fff;
+  border-bottom: 1px solid var(--border-light);
+  border-top: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.statsBar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% -20%, rgba(244,162,0,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  position: relative;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: 0;
+  border-right: 1px solid var(--border-light);
+  background: transparent;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.statItem.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.statItem:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-light);
+}
+
+.iconCircle {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(244,162,0,0.1);
+  border: 1px solid rgba(244,162,0,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.valRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
+.value {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.suffix {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .inner { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .inner { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+.statItem:last-child { border-right: 0; }
+.iconCircle { display: none; }
+.statsBar::before { display: none; }

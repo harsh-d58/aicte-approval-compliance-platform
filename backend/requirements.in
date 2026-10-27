@@ -1,0 +1,7 @@
+# Direct dependencies for the initial FastAPI development environment.
+# requirements.txt records the exact installed packages and transitive versions.
+fastapi
+uvicorn
+python-dotenv
+# Read-only connection/schema diagnostic for the existing PostgreSQL database.
+psycopg[binary]

@@ -1,0 +1,111 @@
+.ctaSec {
+  padding: 7rem 0;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.ctaSec.visible { opacity: 1; }
+
+/* Particle dots */
+.particles { position: absolute; inset: 0; pointer-events: none; }
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(244, 162, 0, 0.4);
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(1.5); }
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  text-align: center;
+  max-width: 720px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1.1rem;
+  background: rgba(244,162,0,0.12);
+  border: 1px solid rgba(244,162,0,0.3);
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #803009;
+  margin-bottom: 2rem;
+  letter-spacing: 0.02em;
+}
+
+.headline {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.5rem;
+}
+
+.highlight { color: #803009; }
+
+.subtext {
+  font-size: 1.0625rem;
+  color: #45404a;
+  line-height: 1.75;
+  margin-bottom: 2.5rem;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ctaGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.ctaBtn {
+  font-size: 1rem;
+  padding: 0.85rem 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.pointsRow {
+  display: flex;
+  gap: 1.25rem 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.point {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: #45404a;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .ctaSec { padding: 5rem 0; }
+  .pointsRow { gap: 0.75rem 1.25rem; }
+}
+
+.particles { display: none; }
+.badge { background: #ffffff90; border-color: #dad6eb; }

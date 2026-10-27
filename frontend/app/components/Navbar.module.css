@@ -1,0 +1,204 @@
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.32);
+  -webkit-backdrop-filter: blur(30px) saturate(120%);
+  backdrop-filter: blur(30px) saturate(120%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(32, 34, 79, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar.scrolled {
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 6px 28px rgba(32, 34, 79, 0.06);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  gap: 1.5rem;
+}
+
+/* Logo */
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.logoImg {
+  height: 48px;
+  width: 48px;
+  object-fit: cover;
+  object-position: left center;
+  flex-shrink: 0;
+}
+
+.moeLogo {
+  height: 46px;
+  width: auto;
+  object-fit: contain;
+  filter: none;
+  opacity: 1;
+  background: transparent;
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logoTitle {
+  font-family: var(--font-heading);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.logoSub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Desktop Nav */
+.desktopNav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.navLink {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.navLink:hover {
+  color: #000;
+  background: #fff;
+}
+
+/* CTA */
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.ctaBtn {
+  font-size: 0.85rem;
+  padding: 0.55rem 1.25rem;
+}
+
+.ctaBtn, .mobileCta {
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(32, 34, 79, 0.22);
+}
+
+.ctaBtn:hover, .mobileCta:hover {
+  color: #000;
+  background: #fff;
+  border-color: #fff;
+}
+
+.navbar a:focus-visible, .hamburger:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 4px;
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.bar1Open { transform: translateY(7px) rotate(45deg); }
+.bar2Open { opacity: 0; transform: scaleX(0); }
+.bar3Open { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile Menu */
+.mobileMenu {
+  display: none;
+  flex-direction: column;
+  background: transparent;
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+}
+
+.mobileMenuOpen {
+  max-height: 400px;
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.mobileLink {
+  display: block;
+  padding: 0.85rem 0.75rem;
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(32, 34, 79, 0.12);
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.mobileLink:hover { color: #000; background: #fff; }
+
+.mobileCta {
+  margin-top: 1.25rem;
+  align-self: flex-start;
+}
+
+@media (max-width: 1120px) {
+  .desktopNav { display: none; }
+  .hamburger { display: flex; }
+  .mobileMenu { display: flex; }
+  .ctaBtn { display: none; }
+}
+
+.mobileMenu[hidden] { display: none; }
+@media (max-width: 580px) {
+  .inner { gap: 0.5rem; }
+  .logoGroup { gap: 0.55rem; }
+  .moeLogo { height: 34px; max-width: 74px; }
+  .logoImg { height: 40px; width: 40px; }
+  .logoTitle { font-size: 0.9rem; }
+  .logoSub { font-size: 0.56rem; max-width: 150px; }
+}

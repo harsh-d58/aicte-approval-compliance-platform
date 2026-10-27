@@ -1,0 +1,183 @@
+.workflowSec {
+  background: white;
+}
+
+.stepper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 1rem 0 2rem;
+  gap: 0;
+  scrollbar-width: thin;
+}
+
+.stepWrapper {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  padding: 1rem 0.75rem;
+  border-radius: 16px;
+  border: 1.5px solid transparent;
+  background: none;
+  transition: all 0.25s ease;
+  min-width: 120px;
+  max-width: 190px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.step.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.step:hover {
+  background: rgba(13,27,62,0.04);
+  border-color: rgba(13,27,62,0.1);
+}
+
+.stepActive {
+  background: rgba(13,27,62,0.05) !important;
+  border-color: var(--step-color) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.stepIcon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--step-color, #0D1B3E);
+  opacity: 0.15;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  position: relative;
+}
+
+/* Override: icon is placed with real opacity via a wrapper trick */
+.step .stepIcon {
+  background: none;
+  opacity: 1;
+  font-size: 2rem;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(13,27,62,0.06);
+  border: 2px solid rgba(13,27,62,0.1);
+  transition: all 0.25s;
+}
+
+.stepActive .stepIcon {
+  background: var(--step-color) !important;
+  background: color-mix(in srgb, var(--step-color) 15%, transparent) !important;
+  border-color: var(--step-color) !important;
+}
+
+.stepLabel {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0D1B3E;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.stepId {
+  font-size: 0.6rem;
+  color: #4A6274;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  text-align: center;
+}
+
+.connector {
+  width: 28px; height: 2px;
+  background: #E0EEF0;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+
+.connectorActive {
+  background: linear-gradient(90deg, #00897B, #1B4F72);
+}
+
+/* Detail panel */
+.detailPanel {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.5rem 2rem;
+  background: #F8FFFE;
+  border: 1.5px solid;
+  border-radius: 16px;
+  animation: slideDown 0.3s ease;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 24px rgba(13,27,62,0.06);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.detailIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.detailStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.detailBadge {
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.detailTitle {
+  font-family: var(--font-heading);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #0D1B3E;
+}
+
+.detailDesc {
+  font-size: 0.9rem;
+  color: #4A6274;
+  line-height: 1.7;
+}
+
+.clickHint {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #596d7d;
+  margin-top: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+  .stepper {
+    justify-content: flex-start;
+    padding-bottom: 1.25rem;
+  }
+  .step { min-width: 80px; padding: 0.75rem 0.5rem; }
+  .connector { width: 16px; }
+}
+
+.stepIcon, .detailIcon { color: var(--step-color); }

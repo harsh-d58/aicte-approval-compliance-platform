@@ -1,0 +1,30 @@
+.overview { background: white; }
+.inner { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4rem; }
+.preview { overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #f4f5fc; box-shadow: var(--shadow-md); }
+.previewHeader { display: flex; align-items: center; gap: 0.6rem; padding: 0.9rem 1.25rem; background: white; border-bottom: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.75rem; font-weight: 600; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #57509c; }
+.demo { display: block; width: 100%; height: auto; }
+.demoFrame { position: relative; }
+/* Logo bounds are proportional to the 800 × 600 animation, so the mask scales with it. */
+.logoBlur {
+  position: absolute;
+  left: 29.1%;
+  top: 59.2%;
+  width: 6.6%;
+  height: 4%;
+  border-radius: 3px;
+  background: rgba(52, 178, 238, 0.25);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.eyebrow { color: var(--accent-secondary); font-size: 0.8rem; font-weight: 600; }
+.content h2 { font-size: clamp(1.7rem, 2.5vw, 2.25rem); font-weight: 700; line-height: 1.35; letter-spacing: -0.025em; margin: 0.8rem 0 1rem; }
+.content p { color: var(--text-muted); line-height: 1.8; }
+.content ul { list-style: none; display: grid; gap: 1.1rem; margin: 1.6rem 0; }
+.content li { border-left: 2px solid #d8d3ef; padding-left: 1rem; }
+.content li strong, .content li span { display: block; font-size: 0.875rem; }
+.content li span { color: var(--text-muted); margin-top: 0.2rem; }
+.link { color: var(--accent-secondary); font-size: 0.875rem; font-weight: 600; }
+.link span { margin-left: 0.5rem; }
+@media (max-width: 900px) { .inner { grid-template-columns: 1fr; gap: 2.5rem; } .preview { order: 2; } }
