@@ -19,18 +19,25 @@ result = {'checked_at': datetime.now(timezone.utc).isoformat(), 'mode': 'read-on
 try:
     if not url:
         raise ValueError('DATABASE_URL is unset')
-    with psycopg.connect(url, connect_timeout=12, options='-c default_transaction_read_only=on -c statement_timeout=10000', row_factory=dict_row) as connection:
+    with psycopg.connect(url, connect_timeout=12, sslmode='require', options='-c statement_timeout=10000', row_factory=dict_row) as connection:
+        connection.read_only = True
         with connection.cursor() as cursor:
-            cursor.execute("SELECT current_setting('transaction_read_only') AS read_only, current_setting('server_version') AS server_version, (SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) AS ssl")
+            cursor.execute("SELECT current_setting('transaction_read_only') AS read_only, current_setting('server_version') AS server_version")
             result.update(cursor.fetchone())
+            result['ssl'] = bool(connection.pgconn.ssl_in_use)
+            if result['read_only'] != 'on':
+                raise RuntimeError('Read-only database transaction could not be established')
+            if not result['ssl']:
+                raise RuntimeError('TLS database connection could not be established')
             cursor.execute("SELECT table_schema, table_name FROM information_schema.tables WHERE table_type='BASE TABLE' AND table_schema NOT IN ('pg_catalog','information_schema') ORDER BY table_schema,table_name")
             result['tables'] = cursor.fetchall()
             cursor.execute("SELECT table_schema,table_name,column_name,data_type,is_nullable,column_default FROM information_schema.columns WHERE table_schema NOT IN ('pg_catalog','information_schema') ORDER BY table_schema,table_name,ordinal_position")
             # Defaults may contain operational details; retain only their presence.
-            result['columns'] = [{**{k: v for k,v in row.items() if k != 'column_default'}, 'has_default': row['column_default'] is not None} for row in cursor.fetchall() if row['table_name'] in expected]
+            result['columns'] = [{**{k: v for k,v in row.items() if k != 'column_default'}, 'has_default': row['column_default'] is not None} for row in cursor.fetchall() if row['table_schema'] == 'public' and row['table_name'] in expected]
             cursor.execute("SELECT tc.table_schema,tc.table_name,tc.constraint_name,tc.constraint_type,kcu.column_name,ccu.table_name AS referenced_table,ccu.column_name AS referenced_column FROM information_schema.table_constraints tc LEFT JOIN information_schema.key_column_usage kcu ON tc.constraint_schema=kcu.constraint_schema AND tc.constraint_name=kcu.constraint_name AND tc.table_name=kcu.table_name LEFT JOIN information_schema.constraint_column_usage ccu ON tc.constraint_schema=ccu.constraint_schema AND tc.constraint_name=ccu.constraint_name WHERE tc.table_schema NOT IN ('pg_catalog','information_schema') ORDER BY tc.table_schema,tc.table_name,tc.constraint_name")
-            result['constraints'] = [row for row in cursor.fetchall() if row['table_name'] in expected]
-            names = {row['table_name'] for row in result['tables']}
+            result['constraints'] = [row for row in cursor.fetchall() if row['table_schema'] == 'public' and row['table_name'] in expected]
+            names = {row['table_name'] for row in result['tables'] if row['table_schema'] == 'public'}
+            result['mapping_schema'] = 'public'
             result['matched_prd_entities'] = sorted(names.intersection(expected))
             result['missing_exact_prd_names'] = sorted(set(expected) - names)
             result['status'] = 'connected'

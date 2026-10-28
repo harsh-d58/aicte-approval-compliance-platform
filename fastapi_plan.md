@@ -1,6 +1,13 @@
 # FastAPI implementation plan — PRD v1.0
 
-Prepared: **27 October 2026**. Implementation update: **28 October 2026**. Status: **B01 API foundation started; business routes and database mapping remain open**.
+Prepared: **27 October 2026**. Implementation update: **28 October 2026**. Status: **B01 schema-name mapping complete; B02 identity boundary in progress; business routes remain open**.
+
+### 28 October 2026 connected-database update
+
+- Corrected an unescaped password delimiter in the ignored local `backend/.env`. The read-only diagnostic now connects over TLS and confirms `transaction_read_only=on`.
+- All 65 PRD §5.2–5.7 entity names exist as `public` tables. The first-stage profile, identity, policy, application and reference tables are empty. [Schema mapping](backend/docs/schema_mapping.md) records the verified coverage and remaining constraints to check.
+- Added configured OIDC RS256 bearer validation and the database-backed `GET /api/v1/me` and `GET /api/v1/me/permissions` routes. Missing provider configuration, invalid tokens, unprovisioned users and database failures fail closed. No frontend live adapter or statutory mutation is claimed.
+- The local `IDENTITY_ISSUER_URL` and `IDENTITY_AUDIENCE` remain unset. Approved role/permission/scope seed data and a real identity-provider integration are required before user-facing business routes can be exercised.
 
 ### 28 October 2026 implementation checkpoint
 

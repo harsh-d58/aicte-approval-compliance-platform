@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from .accounts import router as accounts_router
 from .database import database_is_available
 from .settings import Settings
 
@@ -36,6 +37,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
         openapi_url="/openapi.json" if config.app_env == "development" else None,
     )
+    app.state.settings = config
+    app.include_router(accounts_router, prefix=config.api_prefix)
 
     @app.middleware("http")
     async def correlation_middleware(request: Request, call_next):
@@ -53,10 +56,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, error: HTTPException):
-        if error.status_code == 404:
-            return _error(request, 404, "NOT_FOUND", "Resource not found.")
-        if error.status_code == 405:
-            return _error(request, 405, "METHOD_NOT_ALLOWED", "Method not allowed.")
+        standard = {
+            401: ("UNAUTHENTICATED", "Authentication is required."),
+            403: ("FORBIDDEN", "Access is not permitted."),
+            404: ("NOT_FOUND", "Resource not found."),
+            405: ("METHOD_NOT_ALLOWED", "Method not allowed."),
+            503: ("DEPENDENCY_UNAVAILABLE", "Backend dependencies are not ready."),
+        }
+        if error.status_code in standard:
+            code, message = standard[error.status_code]
+            return _error(request, error.status_code, code, message)
         return _error(request, error.status_code, "HTTP_ERROR", "Request could not be completed.")
 
     @app.exception_handler(RequestValidationError)
