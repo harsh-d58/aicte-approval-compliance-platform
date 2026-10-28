@@ -20,7 +20,7 @@ def _read_connection(url: str | None):
         raise HTTPException(status_code=503)
     try:
         with psycopg.connect(
-            url, connect_timeout=3, sslmode="require", options="-c statement_timeout=3000", row_factory=dict_row
+            url, connect_timeout=8, sslmode="require", options="-c statement_timeout=3000", row_factory=dict_row
         ) as connection:
             if not connection.pgconn.ssl_in_use:
                 raise HTTPException(status_code=503)

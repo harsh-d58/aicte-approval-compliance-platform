@@ -2,18 +2,18 @@
 
 Prepared: **27 October 2026**. Implementation update: **28 October 2026**. Status: **B01 schema-name mapping complete; B02 identity boundary in progress; business routes remain open**.
 
-### 28 October 2026 Keycloak and scoped reads
+### 28 October 2026 Supabase Auth and scoped reads
 
-- Keycloak is the selected prototype identity provider. The backend accepts its configured OIDC issuer/audience, with RS256 signature and claim checks; local loopback HTTP is permitted only in development. No Keycloak deployment or realm settings are present in this checkout yet.
+- The user selected Supabase Auth in place of the PRD's proposed Keycloak prototype choice. The existing database belongs to that Supabase project; its public JWKS exposes ES256. The backend now verifies project-issued access tokens against that JWKS and checks the `authenticated` audience, user/session claims and non-anonymous status. The project URL is configured only in the ignored local `.env`.
 - Added scoped, read-only `GET /institutions`, `GET /institutions/{id}`, `GET /applications`, and `GET /applications/{id}` under `/api/v1`, with cursor pagination and SQL permission/scope checks. [Access policy](backend/docs/access_policy.md) names the two proposed permission codes and exact scope behaviour. No role grants were seeded.
-- The four SQL routes were exercised against the connected empty database using a synthetic subject: lists returned zero records and detail lookups returned 404. Full positive-scope integration remains open until Keycloak and approved grants exist.
+- The four SQL routes were exercised against the connected empty database using a synthetic subject: lists returned zero records and detail lookups returned 404. Full positive-scope integration remains open until Supabase Auth accounts and approved grants exist.
 
 ### 28 October 2026 connected-database update
 
 - Corrected an unescaped password delimiter in the ignored local `backend/.env`. The read-only diagnostic now connects over TLS and confirms `transaction_read_only=on`.
 - All 65 PRD §5.2–5.7 entity names exist as `public` tables. The first-stage profile, identity, policy, application and reference tables are empty. [Schema mapping](backend/docs/schema_mapping.md) records the verified coverage and remaining constraints to check.
-- Added configured OIDC RS256 bearer validation and the database-backed `GET /api/v1/me` and `GET /api/v1/me/permissions` routes. Missing provider configuration, invalid tokens, unprovisioned users and database failures fail closed. No frontend live adapter or statutory mutation is claimed.
-- The local `IDENTITY_ISSUER_URL` and `IDENTITY_AUDIENCE` remain unset. Approved role/permission/scope seed data and a real identity-provider integration are required before user-facing business routes can be exercised.
+- Added database-backed `GET /api/v1/me` and `GET /api/v1/me/permissions` routes. Missing provider configuration, invalid tokens, unprovisioned users and database failures fail closed. The initial OIDC verifier was replaced by the later Supabase Auth verifier above. No frontend live adapter or statutory mutation is claimed.
+- The Supabase project URL and JWKS are now verified. Approved role/permission/scope seed data and an actual Auth user are required before user-facing business routes can be exercised.
 
 ### 28 October 2026 implementation checkpoint
 
@@ -95,7 +95,7 @@ Use only the technology choices proposed in §4.2 for this plan:
 | Background work | Redis and Celery | OCR, scanning deadlines/expiry, delivery/retries, calendar sync, exports and integration jobs. |
 | Files | Encrypted, versioned object storage | Integrate a protected store; vendor is not specified by the PRD. |
 | OCR | PaddleOCR **or** Tesseract | Evaluate the permitted alternatives; the PRD does not choose between them. |
-| Identity | Keycloak for prototype; approved AICTE/government SSO later | Accept bearer identity and enforce application permissions and scope. |
+| Identity | Supabase Auth for prototype per user's 28 October decision; approved AICTE/government SSO later | Verify project access tokens and enforce application permissions and scope. |
 | Notifications | Email, SMS and in-platform adapters | Provider remains subject to approved access. |
 | Calendar | Approved APIs or controlled availability entry | Manual confirmation is a valid fallback. |
 | Monitoring | Prometheus and Grafana | API, worker, integration and database visibility. |

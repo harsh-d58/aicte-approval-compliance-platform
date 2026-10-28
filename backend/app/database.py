@@ -9,7 +9,7 @@ def database_is_available(url: str | None) -> bool:
     try:
         with psycopg.connect(
             url,
-            connect_timeout=3,
+            connect_timeout=8,
             sslmode="require",
             options="-c statement_timeout=3000",
         ) as connection:

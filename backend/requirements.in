@@ -5,5 +5,5 @@ uvicorn
 python-dotenv
 # Read-only connection/schema diagnostic for the existing PostgreSQL database.
 psycopg[binary]
-# OIDC bearer verification against the configured provider's JWKS.
+# Supabase Auth access-token verification against project JWKS.
 PyJWT[crypto]==2.10.1

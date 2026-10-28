@@ -15,8 +15,7 @@ class Settings:
     app_env: str = "development"
     api_prefix: str = "/api/v1"
     database_url: str | None = None
-    identity_issuer_url: str | None = None
-    identity_audience: str | None = None
+    supabase_url: str | None = None
 
     @classmethod
     def load(cls) -> "Settings":
@@ -32,6 +31,5 @@ class Settings:
             app_env=value("APP_ENV", "development"),
             api_prefix=prefix,
             database_url=value("DATABASE_URL") or None,
-            identity_issuer_url=value("IDENTITY_ISSUER_URL").rstrip("/") or None,
-            identity_audience=value("IDENTITY_AUDIENCE") or None,
+            supabase_url=value("SUPABASE_URL").rstrip("/") or None,
         )

@@ -48,8 +48,7 @@ class FoundationTests(unittest.TestCase):
     def test_ready_only_after_configured_database_probe(self):
         app = create_app(Settings(
             database_url="postgresql://placeholder",
-            identity_issuer_url="https://identity.example/realms/aicte",
-            identity_audience="aicte-api",
+            supabase_url="https://project.example.supabase.co",
         ))
         with patch("backend.app.main.database_is_available", return_value=False) as probe:
             self.assertEqual(self.request(app, "/ready").status_code, 503)

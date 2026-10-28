@@ -1,38 +1,38 @@
-"""Validate configured OIDC bearer tokens; never trust client-supplied roles or scopes."""
+"""Verify Supabase Auth access tokens; database assignments grant application access."""
 
 from functools import lru_cache
-import json
 from urllib.error import URLError
 from urllib.parse import urlsplit
-from urllib.request import urlopen
+from uuid import UUID
 
 from fastapi import HTTPException, Request
 import jwt
 from jwt import PyJWKClient
+from jwt.exceptions import PyJWKClientConnectionError, PyJWKSetError
+
+
+ALGORITHMS = ("ES256", "RS256")
+AUDIENCE = "authenticated"
+
+
+def _issuer(project_url: str) -> str:
+    parsed = urlsplit(project_url)
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path not in ("", "/")
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError("SUPABASE_URL must be an HTTPS project base URL")
+    return project_url.rstrip("/") + "/auth/v1"
 
 
 @lru_cache(maxsize=4)
-def _jwk_client(issuer: str, allow_loopback_http: bool = False) -> PyJWKClient:
-    parsed_issuer = urlsplit(issuer)
-    loopback_http = (
-        allow_loopback_http
-        and parsed_issuer.scheme == "http"
-        and parsed_issuer.hostname in {"localhost", "127.0.0.1", "::1"}
-    )
-    if (parsed_issuer.scheme != "https" and not loopback_http) or not parsed_issuer.hostname:
-        raise ValueError("Identity issuer must use HTTPS or development loopback HTTP")
-    discovery_url = issuer.rstrip("/") + "/.well-known/openid-configuration"
-    with urlopen(discovery_url, timeout=3) as response:
-        discovery = json.load(response)
-    jwks_uri = discovery.get("jwks_uri", "")
-    parsed_jwks = urlsplit(jwks_uri)
-    if (
-        discovery.get("issuer") != issuer
-        or parsed_jwks.scheme != parsed_issuer.scheme
-        or parsed_jwks.netloc != parsed_issuer.netloc
-    ):
-        raise ValueError("Invalid identity-provider discovery metadata")
-    return PyJWKClient(jwks_uri, timeout=3, lifespan=300)
+def _jwks_client(project_url: str) -> PyJWKClient:
+    return PyJWKClient(_issuer(project_url) + "/.well-known/jwks.json", timeout=8, lifespan=300)
 
 
 def get_verified_subject(request: Request) -> str:
@@ -41,28 +41,38 @@ def get_verified_subject(request: Request) -> str:
     if scheme.lower() != "bearer" or not separator or not token or len(token) > 16384:
         raise HTTPException(status_code=401)
 
-    settings = request.app.state.settings
-    if not settings.identity_issuer_url or not settings.identity_audience:
+    project_url = request.app.state.settings.supabase_url
+    if not project_url:
         raise HTTPException(status_code=503)
     try:
-        signing_key = _jwk_client(
-            settings.identity_issuer_url,
-            allow_loopback_http=settings.app_env == "development",
-        ).get_signing_key_from_jwt(token)
+        header = jwt.get_unverified_header(token)
+        algorithm = header.get("alg")
+        if algorithm not in ALGORITHMS or not isinstance(header.get("kid"), str) or not header["kid"]:
+            raise HTTPException(status_code=401)
+        signing_key = _jwks_client(project_url).get_signing_key_from_jwt(token)
         claims = jwt.decode(
             token,
             signing_key.key,
-            algorithms=["RS256"],
-            audience=settings.identity_audience,
-            issuer=settings.identity_issuer_url,
-            options={"require": ["exp", "iss", "aud", "sub"]},
+            algorithms=[algorithm],
+            audience=AUDIENCE,
+            issuer=_issuer(project_url),
+            options={"require": ["exp", "iat", "iss", "aud", "sub", "role", "session_id"]},
             leeway=30,
         )
+    except HTTPException:
+        raise
+    except (PyJWKClientConnectionError, PyJWKSetError):
+        raise HTTPException(status_code=503) from None
     except jwt.PyJWTError:
         raise HTTPException(status_code=401) from None
     except (URLError, TimeoutError, OSError, ValueError, KeyError, TypeError):
         raise HTTPException(status_code=503) from None
-    subject = claims.get("sub")
-    if not isinstance(subject, str) or not subject or len(subject) > 255:
+
+    if claims.get("role") != AUDIENCE or claims.get("is_anonymous") is not False:
         raise HTTPException(status_code=401)
+    try:
+        subject = str(UUID(claims["sub"]))
+        UUID(claims["session_id"])
+    except (ValueError, TypeError, KeyError, AttributeError):
+        raise HTTPException(status_code=401) from None
     return subject

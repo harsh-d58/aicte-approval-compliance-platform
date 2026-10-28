@@ -86,7 +86,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/ready", include_in_schema=False)
     def readiness(request: Request):
-        if not config.identity_issuer_url or not config.identity_audience or not database_is_available(config.database_url):
+        if not config.supabase_url or not database_is_available(config.database_url):
             return _error(request, 503, "DEPENDENCY_UNAVAILABLE", "Backend dependencies are not ready.")
         return {"status": "ready"}
 
