@@ -12,10 +12,15 @@ from jwt import PyJWKClient
 
 
 @lru_cache(maxsize=4)
-def _jwk_client(issuer: str) -> PyJWKClient:
+def _jwk_client(issuer: str, allow_loopback_http: bool = False) -> PyJWKClient:
     parsed_issuer = urlsplit(issuer)
-    if parsed_issuer.scheme != "https" or not parsed_issuer.hostname:
-        raise ValueError("Identity issuer must use HTTPS")
+    loopback_http = (
+        allow_loopback_http
+        and parsed_issuer.scheme == "http"
+        and parsed_issuer.hostname in {"localhost", "127.0.0.1", "::1"}
+    )
+    if (parsed_issuer.scheme != "https" and not loopback_http) or not parsed_issuer.hostname:
+        raise ValueError("Identity issuer must use HTTPS or development loopback HTTP")
     discovery_url = issuer.rstrip("/") + "/.well-known/openid-configuration"
     with urlopen(discovery_url, timeout=3) as response:
         discovery = json.load(response)
@@ -23,8 +28,8 @@ def _jwk_client(issuer: str) -> PyJWKClient:
     parsed_jwks = urlsplit(jwks_uri)
     if (
         discovery.get("issuer") != issuer
-        or parsed_jwks.scheme != "https"
-        or parsed_jwks.hostname != parsed_issuer.hostname
+        or parsed_jwks.scheme != parsed_issuer.scheme
+        or parsed_jwks.netloc != parsed_issuer.netloc
     ):
         raise ValueError("Invalid identity-provider discovery metadata")
     return PyJWKClient(jwks_uri, timeout=3, lifespan=300)
@@ -40,7 +45,10 @@ def get_verified_subject(request: Request) -> str:
     if not settings.identity_issuer_url or not settings.identity_audience:
         raise HTTPException(status_code=503)
     try:
-        signing_key = _jwk_client(settings.identity_issuer_url).get_signing_key_from_jwt(token)
+        signing_key = _jwk_client(
+            settings.identity_issuer_url,
+            allow_loopback_http=settings.app_env == "development",
+        ).get_signing_key_from_jwt(token)
         claims = jwt.decode(
             token,
             signing_key.key,

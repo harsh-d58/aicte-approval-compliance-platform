@@ -2,6 +2,8 @@
 
 import asyncio
 from datetime import datetime, timedelta, timezone
+from io import BytesIO
+import json
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -11,7 +13,7 @@ from fastapi import HTTPException
 import httpx
 import jwt
 
-from backend.app.auth import get_verified_subject
+from backend.app.auth import _jwk_client, get_verified_subject
 from backend.app.main import create_app
 from backend.app.settings import Settings
 
@@ -77,6 +79,23 @@ class IdentityTests(unittest.TestCase):
                 with self.assertRaises(HTTPException) as raised:
                     get_verified_subject(self.request_context(self.token(**claims)))
                 self.assertEqual(raised.exception.status_code, 401)
+
+    def test_local_keycloak_http_is_development_only(self):
+        issuer = "http://localhost:8080/realms/aicte"
+        discovery = {"issuer": issuer, "jwks_uri": issuer + "/protocol/openid-connect/certs"}
+        _jwk_client.cache_clear()
+        with self.assertRaises(ValueError):
+            _jwk_client(issuer, allow_loopback_http=False)
+        with patch("backend.app.auth.urlopen", return_value=BytesIO(json.dumps(discovery).encode())):
+            self.assertIsNotNone(_jwk_client(issuer, allow_loopback_http=True))
+        _jwk_client.cache_clear()
+
+    def test_jwks_must_share_issuer_origin(self):
+        discovery = {"issuer": ISSUER, "jwks_uri": "https://different.example/keys"}
+        _jwk_client.cache_clear()
+        with patch("backend.app.auth.urlopen", return_value=BytesIO(json.dumps(discovery).encode())):
+            with self.assertRaises(ValueError):
+                _jwk_client(ISSUER)
 
 
 if __name__ == "__main__":

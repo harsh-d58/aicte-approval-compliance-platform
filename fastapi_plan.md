@@ -2,6 +2,12 @@
 
 Prepared: **27 October 2026**. Implementation update: **28 October 2026**. Status: **B01 schema-name mapping complete; B02 identity boundary in progress; business routes remain open**.
 
+### 28 October 2026 Keycloak and scoped reads
+
+- Keycloak is the selected prototype identity provider. The backend accepts its configured OIDC issuer/audience, with RS256 signature and claim checks; local loopback HTTP is permitted only in development. No Keycloak deployment or realm settings are present in this checkout yet.
+- Added scoped, read-only `GET /institutions`, `GET /institutions/{id}`, `GET /applications`, and `GET /applications/{id}` under `/api/v1`, with cursor pagination and SQL permission/scope checks. [Access policy](backend/docs/access_policy.md) names the two proposed permission codes and exact scope behaviour. No role grants were seeded.
+- The four SQL routes were exercised against the connected empty database using a synthetic subject: lists returned zero records and detail lookups returned 404. Full positive-scope integration remains open until Keycloak and approved grants exist.
+
 ### 28 October 2026 connected-database update
 
 - Corrected an unescaped password delimiter in the ignored local `backend/.env`. The read-only diagnostic now connects over TLS and confirms `transaction_read_only=on`.

@@ -30,7 +30,7 @@ class FoundationTests(unittest.TestCase):
         self.assertEqual(response.headers["X-Correlation-ID"], "e24f669b-577d-489e-8e26-024621663ff9")
 
     def test_missing_route_uses_prd_error_envelope(self):
-        response = self.request(create_app(self.settings), "/api/v1/applications")
+        response = self.request(create_app(self.settings), "/api/v1/never-defined")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json(), {"error": {
             "code": "NOT_FOUND",

@@ -32,6 +32,6 @@ class Settings:
             app_env=value("APP_ENV", "development"),
             api_prefix=prefix,
             database_url=value("DATABASE_URL") or None,
-            identity_issuer_url=value("IDENTITY_ISSUER_URL") or None,
+            identity_issuer_url=value("IDENTITY_ISSUER_URL").rstrip("/") or None,
             identity_audience=value("IDENTITY_AUDIENCE") or None,
         )

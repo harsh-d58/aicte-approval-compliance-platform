@@ -9,6 +9,7 @@ from starlette.exceptions import HTTPException
 
 from .accounts import router as accounts_router
 from .database import database_is_available
+from .records import router as records_router
 from .settings import Settings
 
 
@@ -39,6 +40,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = config
     app.include_router(accounts_router, prefix=config.api_prefix)
+    app.include_router(records_router, prefix=config.api_prefix)
 
     @app.middleware("http")
     async def correlation_middleware(request: Request, call_next):
@@ -58,6 +60,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def http_error(request: Request, error: HTTPException):
         standard = {
             401: ("UNAUTHENTICATED", "Authentication is required."),
+            400: ("INVALID_REQUEST", "Request is invalid."),
             403: ("FORBIDDEN", "Access is not permitted."),
             404: ("NOT_FOUND", "Resource not found."),
             405: ("METHOD_NOT_ALLOWED", "Method not allowed."),

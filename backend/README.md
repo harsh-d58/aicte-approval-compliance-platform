@@ -1,6 +1,6 @@
 # FastAPI backend
 
-The backend now has the B01 database mapping and the first B02 identity boundary. `backend/app/main.py` supplies liveness, dependency readiness, correlation IDs and the PRD §9.1 error envelope. `/api/v1/me` and `/api/v1/me/permissions` validate configured OIDC bearer tokens, resolve the application user in the existing database, and return active scoped assignments or permissions. Business mutations are not exposed yet. The frontend still uses its mock data adapter.
+The backend has the B01 database mapping, B02 Keycloak identity boundary, and first scoped read routes. `backend/app/main.py` supplies liveness, dependency readiness, correlation IDs and the PRD §9.1 error envelope. `/api/v1/me` and `/api/v1/me/permissions` validate configured OIDC bearer tokens and resolve active application assignments. Read-only institution and application list/detail routes enforce permission and scope in SQL. Business mutations are not exposed yet. The frontend still uses its mock data adapter.
 
 ## Local setup
 
@@ -11,7 +11,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-dev.txt
 ```
 
-Copy `backend/.env.example` to `backend/.env` only if that file does not already exist. Supply `DATABASE_URL`, `IDENTITY_ISSUER_URL` and `IDENTITY_AUDIENCE` locally. Never commit credentials or place them in frontend `NEXT_PUBLIC_` variables.
+Copy `backend/.env.example` to `backend/.env` only if that file does not already exist. Supply `DATABASE_URL`, `IDENTITY_ISSUER_URL` and `IDENTITY_AUDIENCE` locally. The latter two must identify the configured Keycloak realm and API audience; see [access_policy.md](docs/access_policy.md). Never commit credentials or place them in frontend `NEXT_PUBLIC_` variables.
 
 ```powershell
 .\.venv\Scripts\python.exe backend\check_database.py
