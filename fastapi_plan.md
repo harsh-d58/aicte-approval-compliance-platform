@@ -1,6 +1,13 @@
 # FastAPI implementation plan — PRD v1.0
 
-Prepared: **27 October 2026**. Updated for teammate handoff: **27 October 2026**. Status: **business API implementation not started; Python environment and a read-only database diagnostic are prepared**.
+Prepared: **27 October 2026**. Implementation update: **28 October 2026**. Status: **B01 API foundation started; business routes and database mapping remain open**.
+
+### 28 October 2026 implementation checkpoint
+
+- Added `backend/app` with versioned API configuration, correlation IDs, PRD-shaped error responses, liveness and fail-closed dependency readiness. No business operation is exposed before identity and the existing schema are verified.
+- Added focused contract tests in `backend/tests/test_foundation.py` and a separate test dependency list.
+- This checkout has no `backend/.env`, so the existing PostgreSQL schema could not be inspected. The local Python environment was recreated using Python 3.12 because the available Python 3.10 cannot install the repository's pinned Starlette. The original environment notes below describe the earlier handoff, not this checkout's current environment.
+- B01 schema mapping and B02 authorisation remain required before exposing institution/application data. The frontend continues to use its mock adapter.
 
 This document plans the FastAPI backend for the AICTE Approval Workflow Automation and Institutional Compliance Monitoring Platform. Its sole product-requirement source is [Product Requirements Document (PRD), v1.0](<Product Requirements Document (PRD)- SIH Round 2 FInalsss- PS4.md>). Section references below refer to that document. The existing frontend and earlier frontend plans do not define additional backend requirements.
 
@@ -54,7 +61,7 @@ The F identifiers and page identifiers refer to the existing engineering tracker
 4. Follow B03–B10 for EVC/records/compliance/time-driven workers and all eight reports, integrating the corresponding remaining frontend controls.
 5. Prove the coherent §20 case and §17 permission/conflict/failure scenarios. Keep incomplete F items and service dependencies unchecked until that evidence exists.
 
-The user's latest instruction is to hand off this work. This update does not resume the frontend audit or start backend implementation.
+The 27 October handoff stopped the frontend audit. The 28 October request starts backend implementation; the B01 foundation above is the first delivered slice.
 
 ## 1. Scope and architectural boundary
 
