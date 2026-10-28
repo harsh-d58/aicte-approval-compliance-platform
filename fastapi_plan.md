@@ -1,52 +1,31 @@
 # FastAPI implementation plan — PRD v1.0
 
-Prepared: **27 October 2026**. Implementation update: **28 October 2026**. Status: **B01 schema-name mapping complete; B02 identity boundary in progress; business routes remain open**.
+Prepared: **27 October 2026**. Reconciled with the implementation on **28 October 2026**. Status: **B01 partially complete; B02 authentication and scoped reads implemented in part; no business writes or workers yet**.
 
-### 28 October 2026 Supabase Auth and scoped reads
+This document tracks the FastAPI backend for the AICTE Approval Workflow Automation and Institutional Compliance Monitoring Platform. Product scope follows [Product Requirements Document (PRD), v1.0](<Product Requirements Document (PRD)- SIH Round 2 FInalsss- PS4.md>). The user selected **Supabase Auth** for the prototype, replacing the PRD's proposed Keycloak choice. The frontend plans do not add backend product requirements.
 
-- The user selected Supabase Auth in place of the PRD's proposed Keycloak prototype choice. The existing database belongs to that Supabase project; its public JWKS exposes ES256. The backend now verifies project-issued access tokens against that JWKS and checks the `authenticated` audience, user/session claims and non-anonymous status. The project URL is configured only in the ignored local `.env`.
-- Added scoped, read-only `GET /institutions`, `GET /institutions/{id}`, `GET /applications`, and `GET /applications/{id}` under `/api/v1`, with cursor pagination and SQL permission/scope checks. [Access policy](backend/docs/access_policy.md) names the two proposed permission codes and exact scope behaviour. No role grants were seeded.
-- The four SQL routes were exercised against the connected empty database using a synthetic subject: lists returned zero records and detail lookups returned 404. Full positive-scope integration remains open until Supabase Auth accounts and approved grants exist.
+## Current implementation and evidence
 
-### 28 October 2026 connected-database update
+| Area | Implemented now | Verification and remaining limit |
+| --- | --- | --- |
+| Existing PostgreSQL | `backend/check_database.py` inspects metadata using TLS and an explicitly read-only transaction. All **65 PRD entity names** exist as `public` tables. | [Schema mapping](backend/docs/schema_mapping.md) records table groups and selected identity columns. Foreign keys, version rules and immutable-record protections are not fully audited. `backend/docs/database_audit.json` is local and ignored. No schema or data writes were made. |
+| Configuration and API shell | `backend/app/settings.py` loads ignored `backend/.env`; `main.py` provides `/api/v1`, `/health`, `/ready`, correlation IDs, PRD-shaped errors and validation responses. | `/ready` probes the database and checks that `SUPABASE_URL` is set; it does not test the Auth server or claim the full product is ready. |
+| Supabase Auth | `auth.py` verifies ES256/RS256 access tokens against the configured project's JWKS; checks issuer, `authenticated` audience, expiry, issue time, user/session UUIDs, role and non-anonymous status. The connected project's public JWKS contains one ES256 key. | A forged token was rejected with 401 using the live JWKS. HS256 tokens are rejected. No real signed-in user journey is possible yet because `auth.users` has zero users. |
+| Current user | `GET /api/v1/me` and `GET /api/v1/me/permissions` query `public.users`, active assignments and role permissions. | An unprovisioned synthetic subject was denied with 403. `public.users`, `roles`, `permissions` and `user_role_assignments` have zero rows; approved grants and a real account remain necessary. |
+| Scoped records | `GET /api/v1/institutions`, `/institutions/{id}`, `/applications`, `/applications/{id}` are read-only. SQL checks active assignments, `institution.read` or `application.read`, and exact institution, direct region, application or explicit global scope as applicable. Lists use cursor pagination. | Queries ran against the connected empty database: lists returned zero records; missing/out-of-scope detail IDs returned 404. Positive-scope integration cannot be demonstrated until approved policy data exists. See [access policy](backend/docs/access_policy.md). |
+| Tests and frontend | 12 backend tests cover API errors/readiness, token claims and rejection, cursor behaviour and scoped-read query contracts. The frontend still uses its demo adapter. | No real frontend-to-API session, statutory transition, audit/outbox, upload, EVC, compliance, notification or report journey is implemented. |
 
-- Corrected an unescaped password delimiter in the ignored local `backend/.env`. The read-only diagnostic now connects over TLS and confirms `transaction_read_only=on`.
-- All 65 PRD §5.2–5.7 entity names exist as `public` tables. The first-stage profile, identity, policy, application and reference tables are empty. [Schema mapping](backend/docs/schema_mapping.md) records the verified coverage and remaining constraints to check.
-- Added database-backed `GET /api/v1/me` and `GET /api/v1/me/permissions` routes. Missing provider configuration, invalid tokens, unprovisioned users and database failures fail closed. The initial OIDC verifier was replaced by the later Supabase Auth verifier above. No frontend live adapter or statutory mutation is claimed.
-- The Supabase project URL and JWKS are now verified. Approved role/permission/scope seed data and an actual Auth user are required before user-facing business routes can be exercised.
+The ignored `backend/.env` contains the working `DATABASE_URL` and a Supabase project URL validated against the project's public JWKS. It is never committed. This local environment uses Python 3.12; `backend/requirements.txt` contains runtime pins and `backend/requirements-dev.txt` adds the test client. An earlier database authentication failure was resolved by encoding a password delimiter in the local URL. Do not create a replacement database or seed official roles and rules from frontend demo identities.
 
-### 28 October 2026 implementation checkpoint
+Checkboxes below represent the **full** package exit criteria. A partial read-only slice does not make B02, B03 or B05 complete.
 
-- Added `backend/app` with versioned API configuration, correlation IDs, PRD-shaped error responses, liveness and fail-closed dependency readiness. No business operation is exposed before identity and the existing schema are verified.
-- Added focused contract tests in `backend/tests/test_foundation.py` and a separate test dependency list.
-- This checkout has no `backend/.env`, so the existing PostgreSQL schema could not be inspected. The local Python environment was recreated using Python 3.12 because the available Python 3.10 cannot install the repository's pinned Starlette. The original environment notes below describe the earlier handoff, not this checkout's current environment.
-- B01 schema mapping and B02 authorisation remain required before exposing institution/application data. The frontend continues to use its mock adapter.
+## Frontend handoff and API gaps
 
-This document plans the FastAPI backend for the AICTE Approval Workflow Automation and Institutional Compliance Monitoring Platform. Its sole product-requirement source is [Product Requirements Document (PRD), v1.0](<Product Requirements Document (PRD)- SIH Round 2 FInalsss- PS4.md>). Section references below refer to that document. The existing frontend and earlier frontend plans do not define additional backend requirements.
-
-**Database: ready, as confirmed by the user.** Integrate with the existing database. Do not create a replacement database or make schema reconstruction a project phase. The user supplied and updated `DATABASE_URL` in the ignored `backend/.env`. Read-only connection attempts, including a diagnostic outside the execution sandbox, still received a PostgreSQL authentication rejection. No catalogue/schema inspection succeeded and no database data was changed. Schema mappings, constraints and PRD coverage therefore remain unverified; this result does not establish that the database is missing or unfinished.
-
-Checkboxes track future backend work. None is marked complete merely because a frontend simulation exists.
-
-## Teammate handoff — current state and next actions
-
-The user stopped further frontend audit/implementation and requested this plan as the handoff. **Do not interpret the frontend backlog below as completed work.** Unfinished local frontend prototypes from the interrupted attempt were removed; the existing 28-test suite and TypeScript check pass again. No new browser acceptance pass or production build was run for this handoff.
-
-| Item | Current evidence / handoff |
-| --- | --- |
-| Frontend coverage | The saved [frontend tracker](frontend_tracker.md) and [remaining-work audit](missing_frontend.md) record all 54 templates present, with 25 page rows partial and F01–F15 still open. These are the previous audit's findings, not a new full page/button verification. |
-| Frontend changes in this attempt | No new frontend functionality is delivered by this handoff. Retain the pre-attempt implementation and its existing fixes. |
-| API coverage | §9.2 has 90 proposed method/path operations. The appendix below matches them. They are specifications, not implemented endpoints. Functional requirements without a complete HTTP contract are identified below and in §14. |
-| Database verification | Configured connection attempted with read-only defaults and bounded timeouts; authentication rejected even after the supplied URL was updated. No schema/query result should be claimed. |
-| Database next action | Database owner should verify the database username/password, connection URL and required connection settings locally in `backend/.env`. Retry the diagnostic, then map the actual schema to PRD §§5–6 before writing persistence code. Do not paste credentials into chat or committed documentation. |
-| Local environment | Root `.venv` uses Python 3.13.2. FastAPI, Uvicorn, dotenv and the PostgreSQL diagnostic driver are installed; package pins are in `backend/requirements.txt`. The driver is an implementation aid, not an additional PRD requirement. |
-| Diagnostic | Run `.venv\Scripts\python.exe backend\check_database.py` from the project root. It reads local configuration, attempts read-only metadata inspection and writes a sanitised local report to `backend/docs/database_audit.json`. It does not print credentials or application records. A successful result is a prerequisite for recording actual schema coverage. |
-| Repository preparation | Root, backend and frontend ignore rules exclude local env/credentials, private keys and generated files. The local database report is ignored; `backend/.env.example` remains trackable. No secret files were tracked in the existing frontend repository at the check. |
-| Runtime | No application server was started during this handoff. |
+The saved [frontend tracker](frontend_tracker.md) and [remaining-work audit](missing_frontend.md) report all 54 templates present, with 25 page rows partial and F01–F15 open. Those are earlier frontend audit findings; this backend work did not re-audit the pages or connect their demo adapter to the API. The PRD §9.2 inventory contains **90 proposed operations**; **six GET operations** from it are currently implemented. `/health` and `/ready` are additional operational endpoints outside the versioned business API.
 
 ### Remaining frontend behaviours and corresponding PRD API coverage
 
-The F identifiers and page identifiers refer to the existing engineering trackers; **the PRD remains the sole source of product scope**. The teammate should finish the relevant client behaviour and server contract together, keeping pending verification/approval distinct from successful completion. Listed URLs are relative to `/api/v1`.
+The F identifiers and page identifiers refer to the existing engineering trackers; **the PRD remains the sole source of product scope**. Finish the relevant client behaviour and server contract together, keeping pending verification/approval distinct from successful completion. Listed URLs are relative to `/api/v1`.
 
 | Backlog / affected pages | Required remaining behaviour | Explicit PRD coverage | Contract detail to settle |
 | --- | --- | --- | --- |
@@ -66,15 +45,12 @@ The F identifiers and page identifiers refer to the existing engineering tracker
 | **F14 · P05/P09/shared** | Remaining task/register filters, stale/offline/session/error recovery, coherent scenarios and broader acceptance. | §§9.1/14/17/20; common filters/pagination/error contracts and access controls. | No task-list API is listed. Define required assigned-work representation; test recovery without claiming formal accessibility/security certification from basic checks. |
 | **F15 · P37/P44–P46/P48** | Attempt-level job history, bounded retry/backoff/max states, scheduled report setup and expired-download lifecycle. | §§8.3–8.4/11.2/15; `GET /admin/jobs`, notification retry, report run/status/download and rule operations. | General job retry, schedule configuration and expiry payloads are not explicitly listed. Distinguish internal worker execution from authorised administrative controls. |
 
-### Teammate's first implementation sequence
+### Next implementation sequence
 
-1. Resolve authentication and obtain a successful read-only schema inspection; document existing-schema mappings without recreating the database.
-2. Implement B01/B02 API conventions, identity/scope, transaction safety, audit and outbox. Keep real data on scoped server responses.
-3. Complete the explicit contracts for the first application/document/deficiency journey, including F02–F05. Document gaps as contract decisions, not purported existing PRD URLs.
-4. Follow B03–B10 for EVC/records/compliance/time-driven workers and all eight reports, integrating the corresponding remaining frontend controls.
-5. Prove the coherent §20 case and §17 permission/conflict/failure scenarios. Keep incomplete F items and service dependencies unchecked until that evidence exists.
-
-The 27 October handoff stopped the frontend audit. The 28 October request starts backend implementation; the B01 foundation above is the first delivered slice.
+1. Provision a real Supabase Auth user and its `public.users` identity mapping through the approved administration process; approve the two proposed read permission codes, scoped role grants and role matrix. Verify positive and negative institution/region/application access with real tokens. No automatic privilege grant follows sign-in.
+2. Finish B01 constraint and version-token review, then B02 transaction safety: write authorisation, idempotency, `If-Match`, audit and outbox in the same committed change. The six current GET routes cover only a read slice.
+3. Implement approved institution/profile and application/document/deficiency contracts (B03–B05), including F02–F05, against the existing schema. Keep frontend demo data separate until the live adapter is authorised and tested.
+4. Continue B06–B10 for EVC, records, compliance, workers and all eight reports; prove the PRD §§17/20 permission, conflict and failure scenarios before marking package gates complete.
 
 ## 1. Scope and architectural boundary
 
@@ -86,9 +62,9 @@ PRD references: §§1–4, 18, 22.
 - [ ] Keep statutory scrutiny, expert selection, verification, findings, report approval and decisions under the authorised human roles.
 - [ ] Keep optional permissioned-ledger work separate from the required append-only audit capability. Ledger failure must never block the main workflow.
 
-Use only the technology choices proposed in §4.2 for this plan:
+Use the technology choices proposed in PRD §4.2, with the user's explicit Supabase Auth substitution:
 
-| Layer | PRD choice | Planning treatment |
+| Layer | Current choice | Planning treatment |
 | --- | --- | --- |
 | API/business backend | Python FastAPI | Build the modular backend and typed request/response contracts. |
 | Authoritative database | PostgreSQL | Existing database; map and integrate. |
@@ -129,15 +105,18 @@ Delivery adapters and operational instrumentation start when their first module 
 
 PRD references: §§4–6, 9.1, 10, 14.
 
-- [ ] Review the existing schema/data dictionary and configured environment through the approved database handoff. Keep credentials out of source, ordinary settings, logs and responses.
-- [ ] Record an entity-to-existing-table/column mapping for §§5–6: organisation/access, applications/workflows, documents/OCR, EVC/records, compliance/renewals, notifications/escalations, reports/audit/jobs/settings.
+- [x] Connect to the existing PostgreSQL database with TLS and a read-only transaction; keep credentials in ignored local configuration and out of responses and committed files.
+- [x] Map all 65 PRD §§5.2–5.7 entity names to existing `public` tables; record selected identity columns in [schema_mapping.md](backend/docs/schema_mapping.md).
+- [ ] Complete the column-level data dictionary for every module and resolve any logical-to-physical field differences before its write API is built.
 - [ ] Verify relevant existing foreign keys, uniqueness, editable version tokens and immutable-record protections. The PRD's schema is logical; equivalent existing names are acceptable (§5). Document any mismatch before proposing a targeted change; do not reset or rewrite existing records.
 - [ ] Preserve distinctions between institution/user, application/submission, document/version, visit-specific membership/reusable committee, evidence/verification, notification/attempt and draft/approved record (§6.2).
 - [ ] Establish backend modules corresponding to §4.1. Keep transport handling, business validation, persistence access and external adapters separable within the monolith. This is code organisation, not a microservice requirement.
-- [ ] Define the versioned internal API under **`/api/v1`**, using JSON over HTTPS except file transfers and bearer identity (§9.1).
+- [x] Define `/api/v1` JSON GET routes and bearer-token dependencies for the implemented identity, institution and application reads.
+- [ ] Verify HTTPS deployment and file-transfer contracts when those runtime paths are added (§9.1).
 - [ ] Return `id`, `status`, timestamps and `version` where appropriate. Match §9.3–9.7 example field names and semantics; example UUIDs, dates, numbering and templates are illustrative.
-- [ ] Use cursor pagination for large lists: `data` plus `page.limit` and `page.next_cursor`; support permitted business filters.
-- [ ] Standardise errors as `error.code`, `message`, `details` and `correlation_id`. Validate request/response data and avoid sensitive values in errors.
+- [x] Use cursor pagination with `data`, `page.limit` and `page.next_cursor` on the current institution/application lists; support their `status` filter and a 1–100 limit.
+- [ ] Extend pagination and permitted filters to later lists and reports.
+- [x] Standardise current API errors as `error.code`, `message`, `details` and `correlation_id`; exclude submitted values from validation details.
 - [ ] Honour §9.1 status semantics: 200/201/202/204; 400/401/403/404/409/412/422/429/500/503. Inaccessible-record errors must not reveal records outside the caller's scope.
 
 **Gate:** a documented database mapping, reviewed API inventory and common contract tests. Database recreation and database credentials committed to a file are not deliverables.
@@ -146,7 +125,9 @@ PRD references: §§4–6, 9.1, 10, 14.
 
 PRD references: §§3, 5.1–5.2, 7.1, 8.2, 9–10, 12–13.
 
-- [ ] Validate bearer identity from the configured provider and resolve the application user/service identity and active scoped assignments. Enforce disabled/revoked access and assignment validity on each request.
+- [x] Validate configured Supabase Auth ES256/RS256 bearer tokens against project JWKS and required claims; resolve an active `public.users` identity and active, time-valid assignments for the implemented GET routes. Reject anonymous, missing and unprovisioned users.
+- [ ] Exercise those identity and assignment paths with a real Supabase Auth user, including disabled/revoked and expired-assignment cases; service identity policy is not defined yet.
+- [x] Filter the current institution/application read queries by database permission and exact authorised scope; return 404 for missing and out-of-scope detail IDs.
 - [ ] Implement Read, Create, Update, Assign, Transition, Return, Verify, Approve, Configure, Export and Administer permissions (§3.3), with institution/region/assigned-case/committee restrictions as applicable.
 - [ ] Enforce scope in record queries, mutations, histories, source inputs, export requests, generated files and individual file access. User-supplied IDs or selected UI roles cannot grant access.
 - [ ] Restrict experts to their assigned committee material and auditors to their authorised inspection/export permissions; technical administration must not imply statutory approval authority.
@@ -165,6 +146,7 @@ PRD references: §§3, 5.1–5.2, 7.1, 8.2, 9–10, 12–13.
 
 PRD references: §§5.2–5.4, 5.7, 7.1, 9.2, BR-01/02/21/23, 21.
 
+- [x] Implement the read-only institution list and detail slice with SQL permission/scope checks; the rest of B03 remains open.
 - [ ] Implement the identity/user and institution/profile operations in the API inventory below, including scoped grants/revocations and permitted profile fields.
 - [ ] Validate institution/campus relationships, reliable unique identifiers, region hierarchy and explicit authorised representation. Entering an institution code must not create access.
 - [ ] Handle typed profile attributes through the controlled catalogue: text/date/number, source-document reference and verification status (§5.2).
@@ -196,6 +178,7 @@ PRD references: §§5.4, 7.5, 8.4, 9.2, BR-16/17/20, 13.2, 15–17.
 
 PRD references: §§5.3, 7.1, 9.2–9.3, 10, BR-01–06/18/21/23/24, 17.1.
 
+- [x] Implement the read-only application list and detail slice with SQL permission/scope checks; intake, review and workflow work remain open.
 - [ ] Implement application intake/search/read/draft edit, submission, path/history, transitions, assignments, deficiency notice/response and item resolution using the listed contracts.
 - [ ] Resolve the applicable approved workflow from application type, institution context, rule version and effectivity. Support Only Scrutiny and EVC-containing sample routes where the approved configuration requires them.
 - [ ] Retain the case's workflow and APH versions. Automatic advancement may occur only when all configured guards pass; manual authority requirements remain enforced.
