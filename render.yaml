@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: aicte-backend
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_ENV
+        value: development
+      - key: API_PREFIX
+        value: /api/v1
+      - key: DATABASE_RUNTIME_URL
+        sync: false
+      - key: DATABASE_WRITE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false
+
