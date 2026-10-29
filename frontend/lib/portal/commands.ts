@@ -1,6 +1,6 @@
 import type { PortalCollections, Role, User, ApplicationStatus, Configuration, ReportCode } from "./types";
 import { demoNow, scopedSnapshot } from "./view-models";
-export type CommandKind = "institution.import" | "attribute.verify" | "renewal.start" | "actionitem.save" | "actionitem.complete" | "application.migrate" | "institution.save" | "campus.save" | "attribute.save" | "application.save" | "application.submit" | "application.assign" | "application.advance" | "application.cancel" | "application.reopen" | "deficiency.issue" | "deficiency.respond" | "deficiency.resolve" | "decision.record" | "document.save" | "document.check" | "document.review" | "renewal.submit" | "renewal.verify" | "committee.save" | "availability.save" | "visit.recommend" | "visit.confirm" | "visit.postpone" | "visit.cancel" | "visit.complete" | "invitation.respond" | "observation.save" | "record.generate" | "record.save" | "record.review" | "record.approve" | "record.changes" | "condition.create" | "evidence.submit" | "evidence.verify" | "condition.close" | "condition.reopen" | "notification.retry" | "notification.read" | "escalation.resolve" | "workflow.save" | "workflow.publish" | "config.save" | "config.publish" | "user.assignment" | "user.status" | "integration.test" | "integration.disable" | "job.retry" | "job.process" | "report.create" | "report.complete";
+export type CommandKind = "document.verify" | "institution.import" | "attribute.verify" | "renewal.start" | "actionitem.save" | "actionitem.complete" | "application.migrate" | "institution.save" | "campus.save" | "attribute.save" | "application.save" | "application.submit" | "application.assign" | "application.advance" | "application.cancel" | "application.reopen" | "deficiency.issue" | "deficiency.respond" | "deficiency.resolve" | "decision.record" | "document.save" | "document.check" | "document.review" | "renewal.submit" | "renewal.verify" | "committee.save" | "availability.save" | "visit.recommend" | "visit.confirm" | "visit.postpone" | "visit.cancel" | "visit.complete" | "invitation.respond" | "observation.save" | "record.generate" | "record.save" | "record.review" | "record.approve" | "record.changes" | "condition.create" | "evidence.submit" | "evidence.verify" | "condition.close" | "condition.reopen" | "notification.retry" | "notification.read" | "escalation.resolve" | "workflow.save" | "workflow.publish" | "config.save" | "config.publish" | "user.assignment" | "user.status" | "integration.test" | "integration.disable" | "job.retry" | "job.process" | "report.create" | "report.complete";
 export interface Command {
     kind: CommandKind;
     id?: string;
@@ -143,7 +143,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
                 campusName: string;
                 city: string;
             }[];
-            requireValue(Array.isArray(rows) && rows.length > 0 && rows.length <= 200, "Import requires 1–200 previewed rows.");
+            requireValue(Array.isArray(rows) && rows.length > 0 && rows.length <= 200, "Import requires 1â€“200 previewed rows.");
             const codes = new Set(data.institutions.map(i => i.code.toLowerCase()));
             for (const row of rows) {
                 requireValue(row.code?.trim() && row.name?.trim() && row.type?.trim() && row.campusName?.trim() && row.city?.trim() && data.regions.some(r => r.id === row.regionId), "Every import row needs valid mapped fields and an existing region.");
@@ -185,6 +185,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             const target = data.workflows.find(w => w.id === text("workflowId") && w.status === "PUBLISHED");
             requireValue(target && target.id !== app.workflowId && target.stages.some(s => s.code === app.currentStage), "Choose a different published workflow containing the current stage.");
             const reason = text("reason");
+            const coiOverrideReason = text("coiOverrideReason", false) || null;
             const previous = app.workflowId;
             app.workflowId = target!.id;
             app.version++;
@@ -283,7 +284,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             const workflow = data.workflows.find(w => w.id === app.workflowId)!;
             requireValue(workflow.status === "PUBLISHED", "Workflow is no longer available.");
             app.submittedAt = demoNow;
-            app.number = app.number.replace("DRAFT", "DEMO");
+            app.number = app.number.replace("DRAFT", "AICTE");
             app.ownerId = data.users.find(u => u.status === "ACTIVE" && u.assignments.some(a => a.role === "SCRUTINY" && (a.scope.type === "GLOBAL" || a.scope.id === data.institutions.find(i => i.id === app.institutionId)?.regionId)))?.id ?? null;
             app.dueAt = new Date(Date.parse(demoNow) + 7 * 86400000).toISOString();
             transition(app, "SUBMITTED", workflow.stages[0].code, "Institution declaration and required sample documents submitted");
@@ -318,7 +319,20 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             const criterion = text("criterion");
             const due = date("dueAt", true);
             const noticeId = uid("notice");
-            data.deficiencies.push({ id: noticeId, number: `DEMO-DEF-${String(data.deficiencies.length + 1).padStart(3, "0")}`, applicationId: app.id, issuedBy: actor.id, issuedAt: demoNow, responseDueAt: due, reason, status: "OPEN", items: [{ id: uid("item"), criterion, description, documentId: text("documentId", false) || null, status: "OPEN", response: null, responseVersionId: null }] });
+            const valuesItems = command.values?.items;
+            const rawItems = Array.isArray(valuesItems) && valuesItems.length > 0
+                ? (valuesItems as Array<Record<string, unknown>>)
+                : [{ criterion, description, documentId: text("documentId", false) || null }];
+            const deficiencyItems = rawItems.map(it => ({
+                id: uid("item"),
+                criterion: String(it.criterion ?? "General"),
+                description: String(it.description ?? ""),
+                documentId: it.documentId ? String(it.documentId) : null,
+                status: "OPEN" as const,
+                response: null,
+                responseVersionId: null,
+            }));
+            data.deficiencies.push({ id: noticeId, number: `DEF-2026-${String(data.deficiencies.length + 1).padStart(3, "0")}`, applicationId: app.id, issuedBy: actor.id, issuedAt: demoNow, responseDueAt: due, reason, status: "OPEN", items: deficiencyItems });
             transition(app, "RETURNED_FOR_DEFICIENCY", "SCRUTINY", reason);
             notify(app.institutionId, "DEFICIENCY_ISSUED", "APPLICATION", app.id);
             const representative = data.users.find(u => u.assignments.some(a => a.role === "INSTITUTION" && a.scope.id === app.institutionId));
@@ -348,11 +362,26 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             }
             else {
                 permit("SCRUTINY", "REGIONAL");
-                requireValue(notice!.status === "RESPONDED", "A response must be submitted first.");
+                requireValue(notice!.status === "RESPONDED" || notice!.items.some(i => i.status === "RESPONDED"), "A response must be submitted first.");
                 text("reason");
-                notice!.items.forEach(item => { item.status = "RESOLVED"; });
-                notice!.status = "RESOLVED";
-                app.version++;
+                const valItemId = command.values?.itemId;
+                const valRes = command.values?.resolution;
+                if (valItemId) {
+                    const item = notice!.items.find(i => i.id === valItemId);
+                    if (item) {
+                        item.status = valRes === "REJECTED" ? "OPEN" : "RESOLVED";
+                    }
+                    if (notice!.items.every(i => i.status === "RESOLVED")) {
+                        notice!.status = "RESOLVED";
+                        app.version++;
+                    } else if (valRes === "REJECTED") {
+                        notice!.status = "OPEN";
+                    }
+                } else {
+                    notice!.items.forEach(item => { item.status = "RESOLVED"; });
+                    notice!.status = "RESOLVED";
+                    app.version++;
+                }
             }
             break;
         }
@@ -518,6 +547,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             requireValue(expertIds.length === visit.requiredMemberCount && new Set(expertIds).size === expertIds.length, `Choose exactly ${visit.requiredMemberCount} distinct experts.`);
             requireValue(expertIds.every(id => data.experts.some(e => e.id === id && e.eligibility === "ELIGIBLE")), "All experts must be eligible.");
             const reason = text("reason");
+            const coiOverrideReason = text("coiOverrideReason", false) || null;
             visit.committee = expertIds.map(expertId => ({ expertId, role: "MEMBER", selectedBy: actor.id, selectedAt: demoNow }));
             for (const expertId of expertIds) {
                 const expert = data.experts.find(e => e.id === expertId)!;
@@ -528,7 +558,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             visit.confirmedSlotId = null;
             visit.status = "AWAITING_AVAILABILITY";
             visit.version++;
-            visit.events.push({ at: demoNow, type: "COMMITTEE_SELECTED", actorId: actor.id, reason });
+            visit.events.push({ at: demoNow, type: "COMMITTEE_SELECTED", actorId: actor.id, reason, ...(coiOverrideReason ? { details: { coi_override: true, coi_override_reason: coiOverrideReason } } : {}) });
             break;
         }
         case "availability.save": {

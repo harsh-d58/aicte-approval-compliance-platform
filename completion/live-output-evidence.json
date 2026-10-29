@@ -1,0 +1,46 @@
+{
+  "audit_actual": {
+    "valid": true,
+    "total_events": 561,
+    "errors": [],
+    "simulation": false,
+    "simulated_event_id": null,
+    "active_triggers": [
+      "audit_events_no_update_delete",
+      "audit_events_no_truncate"
+    ]
+  },
+  "audit_simulation": {
+    "valid": false,
+    "total_events": 561,
+    "errors": [
+      {
+        "id": "41783b06-c11e-4b04-ad9b-13da26da1424",
+        "code": "HASH_INVALID"
+      }
+    ],
+    "simulation": true,
+    "simulated_event_id": "41783b06-c11e-4b04-ad9b-13da26da1424",
+    "active_triggers": [
+      "audit_events_no_update_delete",
+      "audit_events_no_truncate"
+    ]
+  },
+  "report_run_id": "f635939b-a8ad-47b0-852b-8e291d000ae6",
+  "csv": {
+    "bytes": 6370,
+    "path": "output\\reports\\live_verification\\region-performance.csv"
+  },
+  "json": {
+    "bytes": 8033,
+    "path": "output\\reports\\live_verification\\region-performance.json"
+  },
+  "xlsx": {
+    "bytes": 2693,
+    "path": "output\\reports\\live_verification\\region-performance.xlsx"
+  },
+  "pdf": {
+    "bytes": 5875,
+    "path": "output\\reports\\live_verification\\region-performance.pdf"
+  }
+}

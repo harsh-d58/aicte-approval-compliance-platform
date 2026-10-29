@@ -80,8 +80,9 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(len(response.json()["data"]), 1)
         self.assertEqual(response.json()["page"]["next_cursor"], _next_cursor(first))
         self.assertIn("p.permission_code = %s", cursor.sql)
-        self.assertIn("a.scope_type = 'INSTITUTION'", cursor.sql)
-        self.assertIn("a.scope_type = 'REGION'", cursor.sql)
+        self.assertIn("a.status = 'active'", cursor.sql)
+        self.assertIn("a.scope_type = 'institution'", cursor.sql)
+        self.assertIn("a.scope_type = 'region'", cursor.sql)
         self.assertEqual(cursor.params[:2], [UUID(int=9), "institution.read"])
 
     def test_unseen_application_detail_returns_same_404_as_missing(self):
@@ -92,7 +93,7 @@ class RecordTests(unittest.TestCase):
             response = self.request(self.app(), "/api/v1/applications/00000000-0000-0000-0000-000000000001")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json()["error"]["code"], "NOT_FOUND")
-        self.assertIn("a.scope_type = 'APPLICATION'", cursor.sql)
+        self.assertIn("a.scope_type = 'application'", cursor.sql)
         self.assertEqual(cursor.params[-1], "application.read")
 
 

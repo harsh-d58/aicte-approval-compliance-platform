@@ -1,10 +1,13 @@
 """B01 API conventions and fail-closed dependency checks."""
 
 import asyncio
+import os
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
 import httpx
+from fastapi import HTTPException
 
 from backend.app.main import create_app
 from backend.app.settings import Settings
@@ -55,6 +58,44 @@ class FoundationTests(unittest.TestCase):
             probe.assert_called_once_with("postgresql://placeholder")
         with patch("backend.app.main.database_is_available", return_value=True):
             self.assertEqual(self.request(app, "/ready").json(), {"status": "ready"})
+
+    def test_settings_never_fall_back_to_bypass_migration_url(self):
+        with patch.dict(os.environ, {}, clear=True), \
+             patch("backend.app.settings.ENV_FILE", Path(__file__)), \
+             patch("backend.app.settings.dotenv_values", return_value={
+                 "DATABASE_URL": "postgresql://migration-owner",
+             }):
+            self.assertIsNone(Settings.load().database_url)
+        with patch.dict(os.environ, {}, clear=True), \
+             patch("backend.app.settings.ENV_FILE", Path(__file__)), \
+             patch("backend.app.settings.dotenv_values", return_value={
+                 "DATABASE_URL": "postgresql://migration-owner",
+                 "DATABASE_RUNTIME_URL": "postgresql://scoped-reader",
+             }):
+            self.assertEqual(Settings.load().database_url, "postgresql://scoped-reader")
+
+    def test_browser_origin_is_explicitly_allowed_for_live_reads(self):
+        app = create_app(Settings(app_env="production", frontend_origin="https://portal.example.org"))
+        response = self.request(app, "/api/v1/me", headers={"Origin": "https://portal.example.org"})
+        self.assertEqual(response.headers.get("access-control-allow-origin"), "https://portal.example.org")
+        denied = self.request(app, "/api/v1/me", headers={"Origin": "https://other.example.org"})
+        self.assertNotIn("access-control-allow-origin", denied.headers)
+
+    def test_stale_and_conflicting_actions_use_prd_error_envelope(self):
+        app = create_app(self.settings)
+
+        @app.get("/test-stale")
+        def stale():
+            raise HTTPException(status_code=412)
+
+        @app.get("/test-conflict")
+        def conflict():
+            raise HTTPException(status_code=409)
+
+        self.assertEqual(self.request(app, "/test-stale").json()["error"]["code"],
+                         "PRECONDITION_FAILED")
+        self.assertEqual(self.request(app, "/test-conflict").json()["error"]["code"],
+                         "CONFLICT")
 
 
 if __name__ == "__main__":

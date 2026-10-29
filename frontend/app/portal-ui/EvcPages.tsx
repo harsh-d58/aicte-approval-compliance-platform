@@ -38,7 +38,62 @@ export default function EvcPages({ mode }: {
     const slots = data.slots.filter(slot => slot.visitId === visit.id);
     const recommendation = recommendVisit(data, visit.id);
     return <Page title={mode === "committee" ? "Select committee" : mode === "schedule" ? "Recommend & confirm a slot" : mode === "observations" ? "Visit observations" : mode === "generate" ? "Generate draft record" : "Expert visit workspace"} description={`${caseName(visit.applicationId)} · ${humanize(visit.status)} · version ${visit.version}`}><Links items={[["EVC queue", "/portal/evc"], ["Visit overview", base], ["Committee", `${base}/committee`], ["Schedule", `${base}/schedule`], ["Observations", `${base}/observations`], ["Draft record", `${base}/records/new`], ["Application", `/portal/applications/${visit.applicationId}`]]}/><Panel><Meta items={[["Status", <Badge key="s" status={visit.status}/>], ["Committee", `${visit.committee.length}/${visit.requiredMemberCount}`], ["Required by (IST)", formatDateTime(visit.requiredBy)], ["Duration", `${visit.durationMinutes} minutes`], ["Coordinator", name(visit.coordinatorId)], ["Confirmed slot", slots.find(s => s.id === visit.confirmedSlotId) ? formatDateTime(slots.find(s => s.id === visit.confirmedSlotId)!.startAt) : "Not confirmed"]]}/></Panel>
- {(mode === "detail" || mode === "committee") && <Panel title="Officer-selected membership"><Table columns={["Expert", "Expertise", "Eligibility", "Selected by"]} rows={visit.committee.map(m => { const e = data.experts.find(e => e.id === m.expertId); return [name(e?.userId ?? m.expertId), e?.expertise.join(", "), e?.eligibility, name(m.selectedBy)]; })}/>{mode === "committee" && allowed("REGIONAL") && !["COMPLETED", "CANCELLED"].includes(visit.status) && <ReasonAction kind="committee.save" id={visit.id} version={visit.version} label="Save selected committee"><p>Choose exactly {visit.requiredMemberCount} eligible experts. Replacing members invalidates an earlier slot confirmation.</p><Checks name="expertIds" selected={visit.committee.map(m => m.expertId)} options={data.experts.filter(e => e.eligibility === "ELIGIBLE").map(e => ({ id: e.id, name: `${name(e.userId)} · ${e.expertise.join(", ")}` }))}/><input type="hidden" name="_selection" value="explicit"/></ReasonAction>}</Panel>}
+ {(mode === "detail" || mode === "committee") && <>
+   {mode === "committee" && (() => {
+     const app = data.applications.find(a => a.id === visit.applicationId);
+     const inst = data.institutions.find(i => i.id === app?.institutionId);
+     const instRegion = data.regions.find(r => r.id === inst?.regionId);
+     const coiCandidates = data.experts.map(e => {
+       const u = data.users.find(usr => usr.id === e.userId);
+       const conflicts: string[] = [];
+       if (e.eligibility !== "ELIGIBLE") conflicts.push("Accreditation: Profile not in eligible status");
+       if (u?.assignments.some(a => a.scope.type === "REGION" && a.scope.id === inst?.regionId)) {
+         conflicts.push(`Jurisdiction: Assigned to same region (${instRegion?.name ?? "Regional collision"})`);
+       }
+       if (u?.assignments.some(a => a.scope.type === "INSTITUTION" && a.scope.id === inst?.id)) {
+         conflicts.push(`Affiliation: Direct assignment with ${inst?.name ?? "applicant institution"}`);
+       }
+       const priorVisits = data.visits.filter(v => v.id !== visit.id && v.applicationId === app?.id && v.committee.some(m => m.expertId === e.id));
+       if (priorVisits.length > 0) {
+         conflicts.push(`History: Conducted ${priorVisits.length} prior EVC visit(s) for this institution`);
+       }
+       const isClear = conflicts.length === 0;
+       return { expert: e, user: u, isClear, conflicts };
+     });
+     const clearCount = coiCandidates.filter(c => c.isClear).length;
+     const conflictCount = coiCandidates.length - clearCount;
+
+     return (
+       <Panel title="Automated Conflict of Interest (COI) Screening Matrix (PRD §5.5, BR-07)">
+         <p className={s.note}>
+           <strong>Statutory Independence Screener:</strong> Evaluates regional jurisdiction detachment, 36-month prior inspection cooldown, institutional non-affiliation, and active accreditation.
+           Screened: <strong>{coiCandidates.length}</strong> | Independent: <strong style={{ color: "var(--success, #16a34a)" }}>{clearCount} Clear</strong> | Flagged: <strong style={{ color: conflictCount > 0 ? "var(--warning, #d97706)" : "inherit" }}>{conflictCount} Conflict(s)</strong>
+         </p>
+         <Table
+           columns={["Candidate Expert", "Expertise", "COI Status", "Conflict Risk Assessment", "Accreditation"]}
+           rows={coiCandidates.map(c => [
+             `${c.user?.displayName ?? c.expert.id} (${c.user?.email ?? "Email unavailable"})`,
+             c.expert.expertise.join(", "),
+             c.isClear ? "✓ Clear (Independent)" : "⚠ Conflict Detected",
+             c.isClear ? "Zero conflict factors identified" : c.conflicts.join("; "),
+             c.expert.eligibility,
+           ])}
+         />
+       </Panel>
+     );
+   })()}
+   <Panel title="Officer-selected membership">
+     <Table columns={["Expert", "Expertise", "Eligibility", "Selected by"]} rows={visit.committee.map(m => { const e = data.experts.find(e => e.id === m.expertId); return [name(e?.userId ?? m.expertId), e?.expertise.join(", "), e?.eligibility, name(m.selectedBy)]; })}/>
+     {mode === "committee" && allowed("REGIONAL") && !["COMPLETED", "CANCELLED"].includes(visit.status) && (
+       <ReasonAction kind="committee.save" id={visit.id} version={visit.version} label="Save selected committee">
+         <p>Choose exactly {visit.requiredMemberCount} eligible experts. Replacing members invalidates an earlier slot confirmation.</p>
+         <Checks name="expertIds" selected={visit.committee.map(m => m.expertId)} options={data.experts.filter(e => e.eligibility === "ELIGIBLE").map(e => ({ id: e.id, name: `${name(e.userId)} · ${e.expertise.join(", ")}` }))}/>
+         <Field name="coiOverrideReason" label="Authorised COI Override Justification (required only if selecting flagged experts)" type="textarea" required={false}/>
+         <input type="hidden" name="_selection" value="explicit"/>
+       </ReasonAction>
+     )}
+   </Panel>
+ </>}
  {mode === "schedule" && <><Panel title="Readiness & explanations"><p>All selected experts and the institution must share a fresh available interval. Sample preparation lead: {visit.policy?.preparationLeadHours ?? 48} hours; freshness: {visit.policy?.freshnessHours ?? 24} hours. Recommendations do not choose experts.</p>{recommendation.blockers.map((b, i) => <p key={i} className={s.error}>{b}</p>)}{allowed("REGIONAL", "EVC_COORDINATOR") && <ActionForm kind="visit.recommend" id={visit.id} version={visit.version} submit="Generate fresh recommendations"/>}</Panel><Panel title="Ranked candidate slots"><Table columns={["Rank / slot", "Feasibility", "Explanation", "Snapshot / expires (IST)"]} rows={slots.map(slot => [`${slot.rank} · ${formatDateTime(slot.startAt)} – ${formatDateTime(slot.endAt)}`, slot.feasible ? "Feasible" : "Blocked", [...slot.explanation, ...slot.blockers].join("; "), `${formatDateTime(slot.snapshotAt)} / ${formatDateTime(slot.expiresAt)}`])}/>{allowed("REGIONAL", "EVC_COORDINATOR") && visit.status === "PROPOSED" && <ReasonAction kind="visit.confirm" id={visit.id} version={visit.version} label="Revalidate & confirm slot"><Field name="slotId" label="Feasible recommendation" options={slots.filter(s => s.feasible).map(s => ({ id: s.id, name: `${formatDateTime(s.startAt)} · rank ${s.rank}` }))}/><p className={s.note}>Confirmation rechecks exact membership, fresh availability, collisions, lead time and deadline before queuing simulated invitations.</p></ReasonAction>}</Panel></>}
  {(mode === "detail" || mode === "observations") && <><Panel title="Observations"><Table columns={["Criterion", "Observation", "Author", "Status"]} rows={observations.map(o => [o.criterion, o.text, name(o.authorId), o.status])}/></Panel>{mode === "observations" && allowed("EVC_EXPERT", "EVC_COORDINATOR", "REGIONAL") && <Panel title="Add an authorised observation"><ActionForm kind="observation.save" defaults={{ visitId: visit.id }} submit="Save observation" build={fd => ({ submit: fd.get("submitObservation") === "on" })}><Field name="criterion" label="Criterion / question"/><Field name="text" label="Observation or committee note" type="textarea"/><label className={s.check}><input type="checkbox" name="submitObservation"/>Submit as an authorised source for meeting records</label></ActionForm></Panel>}</>}
  {mode === "observations" && <Panel title="Questions & action items"><Table columns={["Action / question", "Responsible role", "Due (IST)", "Status"]} rows={data.actionItems.filter(a => a.visitId === visit.id).map(a => [a.description, a.responsibleRole, formatDateTime(a.dueAt), a.status])}/>{allowed("EVC_EXPERT", "EVC_COORDINATOR", "REGIONAL") && <ActionForm kind="actionitem.save" defaults={{ visitId: visit.id }} submit="Create source-linked action"><Field name="observationId" label="Submitted source observation" options={observations.filter(o => o.status === "SUBMITTED").map(o => ({ id: o.id, name: o.criterion }))}/><Field name="description" label="Action / question" type="textarea"/><Field name="responsibleRole" label="Responsible role" options={Object.entries(roleNames).map(([id, name]) => ({ id, name }))}/><Field name="dueAt" label="Due (IST)" type="datetime-local"/></ActionForm>}{allowed("EVC_EXPERT", "EVC_COORDINATOR", "REGIONAL") && data.actionItems.filter(a => a.visitId === visit.id && a.status === "OPEN").map(a => <ReasonAction key={a.id} kind="actionitem.complete" id={a.id} label={`Complete: ${a.description}`}/>)}</Panel>}

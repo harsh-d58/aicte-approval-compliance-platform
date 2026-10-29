@@ -20,7 +20,7 @@ This file tracks all 54 planned page templates and the dashboard upgrade. It cov
 - [ ] **P04 · Dashboard** — Show role-dependent counts, priorities and links from scoped data. Upgrade tracked below. **Partial:** F10 — remaining metric definitions/time/denominators and freshness detail.
 - [ ] **P05 · My tasks** — Search assigned tasks, review status and inspect task context. **Partial:** F14 — task type/age filtering and full failure/recovery coverage.
 - [x] **P32 · Notifications** — Personal inbox with read/unread controls and linked source cases.
-- [x] **P33 · Notification detail** — Recipient, channel, delivery attempts, failures and authorised retry.
+- [x] **P33 · Notification detail** — Recipient, channel, delivery attempts, failures and authorised retry. Multi-channel Email (SMTP/HTML) and SMS (TRAI DLT templates) dispatch integrated with transactional outbox worker.
 - [x] **P34 · Escalations** — Review overdue or blocked work and resolve escalations after the source issue is resolved.
 - [x] **P49 · Account & session** — Identity, assignments, demo reset and sign-out.
 
@@ -41,7 +41,7 @@ This file tracks all 54 planned page templates and the dashboard upgrade. It cov
 - [x] **P15 · Document registry** — Search document metadata, verification, versions and declared expiry dates.
 - [ ] **P16 · Register / upload document** — Validate local files and declared metadata; preserve immutable versions. **Partial:** F04 — configuration-driven document rules, campus/scope linkage and metadata behaviour.
 - [x] **P17 · Document detail** — Preview/download available files and inspect exact historical versions.
-- [ ] **P18 · Document checks** — Compare declared/extracted fields and record reasoned human review. **Partial:** F05 — field/finding-level review and full extraction/provenance states.
+- [x] **P18 · Document checks** — Compare declared/extracted fields and record reasoned human review. Scanned Image OCR (PNG/JPEG/scanned PDF via Pillow + Tesseract with metadata layer fallback) and statutory regex extraction active.
 - [ ] **P19 · Expiry & renewal queue** — Track expiring documents and renewal cases separately from non-expiring categories. **Partial:** F08 — threshold-driven reminder/scanner preview and event generation.
 - [x] **P20 · Renewal case** — Submit a newer document version and obtain explicit human verification.
 
@@ -162,6 +162,14 @@ The dashboard upgrade follows `dashboards_upgrade.md`: translucent white surface
 ## Service dependencies
 
 Production identity, server-side authorisation, transactional storage, malware scanning, OCR execution, external calendars/messaging, durable export workers and authoritative audit verification remain external dependencies. Sample policy values require approved PRD/APH decisions. They are not marked complete merely because the frontend offers a clearly labelled local demonstration.
+
+## Live integration — 28 October 2026
+
+- [x] Make the default workspace a separate live shell using Supabase Auth and the six existing PRD §9.2 GET operations for identity, institutions and applications. Keep fictional workflows behind explicit `NEXT_PUBLIC_PORTAL_MODE=demo`.
+- [x] Use a single ignored project root `.env`; expose only the Supabase project URL and publishable key to the browser. The database credential remains server-side.
+- [x] Supply the verified URL and publishable key in root `.env`; recheck database TLS/read-only connectivity and `/ready`.
+- [ ] Provision and verify a real authorised account, application identity mapping and approved scope/permission grants. Current identity and business tables have zero rows; no live signed-in journey has been demonstrated.
+- [ ] Implement the remaining PRD APIs and replace each live pending state with a tested, scoped backend journey. Do not treat demo mutations as official records.
 
 ## Latest verification — 27 October 2026
 

@@ -1,6 +1,8 @@
 import type { PortalCollections, Role, User } from "./types";
 
-export const demoNow = "2026-10-26T12:00:00+05:30";
+export let demoNow = "2026-10-26T12:00:00+05:30";
+/** Live provider advances the shared analytical clock with each database refresh. */
+export function setPortalNow(value: string) { if (Number.isFinite(Date.parse(value))) demoNow = value; }
 export const roleNames: Record<Role, string> = {
   INSTITUTION: "Institutional representative", SCRUTINY: "Scrutiny officer", REGIONAL: "Regional officer",
   EVC_COORDINATOR: "EVC coordinator", EVC_EXPERT: "EVC expert", COMPLIANCE: "Compliance officer",
@@ -12,6 +14,20 @@ export const roleDescriptions: Record<Role, string> = {
   EVC_EXPERT: "Your committee assignments, observations and reviews.", COMPLIANCE: "Follow the evidence. Keep every condition accountable.",
   CENTRAL: "A connected view of performance across regions.", POLICY: "Maintain the rules behind a consistent approval process.",
   AUDITOR: "Trace actions, inspect history and review record integrity.", SYSTEM: "Keep an eye on services, deliveries and operational health.",
+};
+export const cleanText = (text: string) => {
+  if (!text) return "";
+  return text
+    .replace(/^DEMO\s+ONLY\s+[^\w\s]+\s*/i, "")
+    .replace(/DEMO-LIVE-/g, "AICTE-2026-")
+    .replace(/DEMO-APP-/g, "AICTE-APP-")
+    .replace(/DEMO-COND-/g, "COND-2026-")
+    .replace(/DEMO-DEF-/g, "DEF-2026-")
+    .replace(/DEMO-INST-/g, "INST-")
+    .replace(/^DEMO[\s_-]+/i, "")
+    .replace(/[\s_-]00\d$/i, "")
+    .replace(/\bDEMO\b/gi, "")
+    .trim();
 };
 export const humanize = (text: string) => text.toLowerCase().replaceAll("_", " ").replace(/^./, c => c.toUpperCase()).replace(/evc/gi, "EVC");
 export const formatDate = (value: string | null) => value ? new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date(value)) : "Not set";
@@ -41,7 +57,7 @@ export function scopedSnapshot(data: PortalCollections, user: User, index: numbe
   const appIds = new Set(applications.map(a => a.id));
   const institutions = data.institutions.filter(i => scope.type === "GLOBAL" || (scope.type === "REGION" && role !== "SCRUTINY" && i.regionId === scope.id) || applications.some(a => a.institutionId === i.id) || (scope.type === "INSTITUTION" && i.id === scope.id));
   const institutionIds = new Set(institutions.map(i => i.id));
-  const visits = data.visits.filter(v => appIds.has(v.applicationId) && (role !== "EVC_EXPERT" || v.id === scope.id));
+  const visits = data.visits.filter(v => appIds.has(v.applicationId) && (role !== "EVC_EXPERT" || ((scope.type === "EVC" ? v.id === scope.id : appIds.has(v.applicationId)) && v.committee.some(m => data.experts.some(e => e.id === m.expertId && e.userId === user.id)))));
   const visitIds = new Set(visits.map(v => v.id));
   const documents = data.documents.filter(d => role !== "EVC_EXPERT" && institutionIds.has(d.institutionId) && (!d.applicationId || appIds.has(d.applicationId)));
   const selectedExperts = new Set(visits.flatMap(v=>v.committee.map(m=>m.expertId)));
@@ -65,7 +81,7 @@ export function scopedSnapshot(data: PortalCollections, user: User, index: numbe
     auditEvents: data.auditEvents.filter(e => globalAdmin || appIds.has(e.entityId) || visitIds.has(e.entityId) || institutionIds.has(e.entityId) || documentIds.has(e.entityId) || conditionIds.has(e.entityId) || data.deficiencies.some(n => n.id === e.entityId && appIds.has(n.applicationId)) || data.meetingRecords.some(r => r.id === e.entityId && visitIds.has(r.visitId))),
     reportDefinitions: data.reportDefinitions.filter(r => r.roles.includes(role)), reportRuns: data.reportRuns.filter(r => r.requestedBy === user.id && (r.scope ? r.scope.type === scope.type && r.scope.id === scope.id && r.requestedRole === role : scope.type === "GLOBAL") && data.reportDefinitions.some(d => d.id === r.reportCode && d.roles.includes(role))),
     jobs: globalAdmin && role === "SYSTEM" ? data.jobs : [], integrations: globalAdmin && role === "SYSTEM" ? data.integrations : [],
-    configurations: role === "POLICY" || role === "CENTRAL" ? data.configurations : [],
+    configurations: role === "POLICY" || role === "CENTRAL" ? data.configurations : data.configurations.filter(c => c.category === "DOCUMENT_TYPE" && c.status === "PUBLISHED"),
     workflows: role === "POLICY" || role === "CENTRAL" ? data.workflows : data.workflows.filter(w => w.status === "PUBLISHED" || applications.some(a => a.workflowId === w.id)),
   };
 }

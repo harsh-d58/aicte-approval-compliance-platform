@@ -1,0 +1,19 @@
+{
+  "document_type": "FIRE SAFETY CERTIFICATE",
+  "government": "Government of National Capital Territory of Delhi",
+  "department": "Delhi Fire Service",
+  "application_id": "52026021801098",
+  "reference_label": "Application ID",
+  "issue_date_iso": "2026-03-06",
+  "printed_issue_date": "06-03-2026",
+  "inspection_date_iso": "2026-02-25",
+  "institution": "Hari Vidhya Bhawan School",
+  "address": "K-II/600, Sangam Vihar, New Delhi - 110080",
+  "validity_duration_years": 3,
+  "explicit_expiry_date": null,
+  "expiry_note": "The document prints a start date and three-year duration, not a separately labelled expiry date. Do not claim an explicit extracted expiry date.",
+  "named_officer": "A.K.Malik",
+  "officer_designation": "Dy.Chief Fire Officer",
+  "signature_note": "The source says it is computer generated and does not require signature.",
+  "provenance": "Human labels from the rendered original; this answer key is separate from upload files."
+}

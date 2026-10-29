@@ -41,6 +41,11 @@ def get_verified_subject(request: Request) -> str:
     if scheme.lower() != "bearer" or not separator or not token or len(token) > 16384:
         raise HTTPException(status_code=401)
 
+    from .prototype import verify_prototype_token
+    prototype_subject = verify_prototype_token(request, token)
+    if prototype_subject is not None:
+        return prototype_subject
+
     project_url = request.app.state.settings.supabase_url
     if not project_url:
         raise HTTPException(status_code=503)

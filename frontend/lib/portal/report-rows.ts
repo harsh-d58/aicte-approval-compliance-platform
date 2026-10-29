@@ -44,7 +44,7 @@ export function getReportRows(code: ReportCode, data: PortalCollections, now: st
                 Reviewer: user(c.reviewerId), Escalation: data.escalations.find(e => e.entityId === c.id)?.status ?? "None" };
         });
         case "document-validity": return data.documents.map(d => {
-            const version = d.versions.find(v => v.id === d.currentVersionId)!;
+            const version = d.versions.find(v => v.id === d.currentVersionId) ?? {issuedAt:null, expiryDate:null, number:0, verification:"PENDING"};
             return { Institution: institution(d.institutionId)?.name ?? d.institutionId, "Document type": d.type, "Issue date": date(version.issuedAt),
                 "Expiry date": d.supportsExpiry ? date(version.expiryDate) : "Not applicable", Version: version.number, "Verification status": version.verification,
                 "Renewal status": data.renewals.find(r => r.documentId === d.id)?.status ?? "Not required" };

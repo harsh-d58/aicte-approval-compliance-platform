@@ -13,7 +13,7 @@ target = ROOT / 'backend/docs/database_audit.json'
 prd = next(ROOT.glob('*PRD*.md')).read_text(encoding='utf-8')
 entity_section = prd.split('## **5.2 ', 1)[1].split('# **6\\.', 1)[0]
 expected = sorted(set(re.findall(r'^\|\s*`([a-z_]+)`\s*\|', entity_section, re.M)))
-settings = dotenv_values(ROOT / 'backend/.env')
+settings = dotenv_values(ROOT / '.env')
 url = settings.get('DATABASE_URL')
 result = {'checked_at': datetime.now(timezone.utc).isoformat(), 'mode': 'read-only metadata', 'expected_prd_entities': expected}
 try:

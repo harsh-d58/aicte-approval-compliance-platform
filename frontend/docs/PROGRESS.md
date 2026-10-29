@@ -1,5 +1,9 @@
 # Frontend progress — 27 October 2026
 
+## Live read integration — 28 October 2026
+
+The default `/login` and `/portal` experience now uses Supabase Auth and the existing FastAPI identity, institution and application GET routes. It displays only authorised live reads; all other PRD work is marked pending in that shell. The 54-template fictional demonstration remains available only by explicitly setting `NEXT_PUBLIC_PORTAL_MODE=demo`. Both applications load the single ignored project root `.env`. The project URL and publishable key are set; the latest database diagnostic connected over TLS in a read-only transaction and `/ready` returned 200. No Auth users, application identities, grants, institutions or applications exist yet, so the live signed-in journey has not been exercised end to end.
+
 ## Fresh PRD recheck result
 
 All 54 page templates are implemented, but several required behaviours remain partial. This is not full PRD completion. The complete PRD was reread after the build; F01–F15 in [missing_frontend.md](../../missing_frontend.md) now list concrete remaining UI/local-domain work separately from service dependencies. Corresponding tracker rows were reopened. The full §20 single-case browser scenario remains open. Two review defects were fixed: export runs are now bound to role and exact assignment scope, and renewals reject older/equal versions. The regression suite now has **28 passing tests**.

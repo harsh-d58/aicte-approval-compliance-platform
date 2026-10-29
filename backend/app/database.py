@@ -9,15 +9,18 @@ def database_is_available(url: str | None) -> bool:
     try:
         with psycopg.connect(
             url,
-            connect_timeout=8,
+            connect_timeout=15,
             sslmode="require",
-            options="-c statement_timeout=3000",
+            options="-c statement_timeout=30000",
         ) as connection:
             if not connection.pgconn.ssl_in_use:
                 return False
             connection.read_only = True
             with connection.cursor() as cursor:
-                cursor.execute("SELECT current_setting('transaction_read_only'), 1")
-                return cursor.fetchone() == ("on", 1)
+                cursor.execute(
+                    "SELECT current_setting('transaction_read_only'), current_user, "
+                    "rolsuper, rolbypassrls FROM pg_roles WHERE rolname = current_user"
+                )
+                return cursor.fetchone() == ("on", "aicte_api_reader", False, False)
     except (psycopg.Error, OSError, ValueError):
         return False

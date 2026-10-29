@@ -7,3 +7,10 @@ python-dotenv
 psycopg[binary]
 # Supabase Auth access-token verification against project JWKS.
 PyJWT[crypto]==2.10.1
+pypdf==6.10.0
+pillow>=10.0.0
+pytesseract>=0.3.10
+rapidocr==3.10.0
+onnxruntime==1.24.4
+pypdfium2==4.30.0
+reportlab==4.4.10

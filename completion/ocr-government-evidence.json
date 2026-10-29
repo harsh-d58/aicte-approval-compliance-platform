@@ -1,0 +1,2748 @@
+[
+  {
+    "file": "output\\pdf\\ocr_manual_test\\official_certificate_image_only.pdf",
+    "status": "completed",
+    "source_text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nDFs\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2.\nAll the employees shall be acquainted with the use and maintenance of all fire equipments and method of smooth,\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAnetr etn o  vo  ttt ttt to ttton tto osvet on ti fro\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nTohe r(          t l    f   t t ot\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+    "source_error": null,
+    "engine_name": "RapidOCR ONNX",
+    "engine_version": "3.10.0",
+    "confidence_summary": {
+      "overall_confidence": 0.9640675,
+      "source": "RapidOCR ONNX",
+      "ocr_performed": true,
+      "pages": [
+        {
+          "page": 1,
+          "mode": "pixel_ocr",
+          "text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nDFs\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2.\nAll the employees shall be acquainted with the use and maintenance of all fire equipments and method of smooth,\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAnetr etn o  vo  ttt ttt to ttton tto osvet on ti fro\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nTohe r(          t l    f   t t ot\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+          "confidence": 0.9640675,
+          "engine": "RapidOCR ONNX",
+          "version": "3.10.0",
+          "regions": [
+            {
+              "text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI",
+              "confidence": 0.9918,
+              "box": [
+                [
+                  292.7386169433594,
+                  149.59930419921875
+                ],
+                [
+                  1195.2613525390625,
+                  149.59930419921875
+                ],
+                [
+                  1195.2613525390625,
+                  180.36795043945312
+                ],
+                [
+                  292.7386169433594,
+                  180.36795043945312
+                ]
+              ]
+            },
+            {
+              "text": "HEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001",
+              "confidence": 0.97678,
+              "box": [
+                [
+                  290.625,
+                  180.36795043945312
+                ],
+                [
+                  1193.147705078125,
+                  180.36795043945312
+                ],
+                [
+                  1193.147705078125,
+                  211.1365966796875
+                ],
+                [
+                  290.625,
+                  211.1365966796875
+                ]
+              ]
+            },
+            {
+              "text": "Application ID. 52026021801098",
+              "confidence": 0.9944,
+              "box": [
+                [
+                  77.14772033691406,
+                  353.3089904785156
+                ],
+                [
+                  459.71588134765625,
+                  352.24798583984375
+                ],
+                [
+                  459.71588134765625,
+                  384.07763671875
+                ],
+                [
+                  77.14772033691406,
+                  385.13861083984375
+                ]
+              ]
+            },
+            {
+              "text": "Dated: 06-03-2026",
+              "confidence": 0.98734,
+              "box": [
+                [
+                  1192.0908203125,
+                  353.3089904785156
+                ],
+                [
+                  1408.738525390625,
+                  353.3089904785156
+                ],
+                [
+                  1408.738525390625,
+                  380.8946838378906
+                ],
+                [
+                  1192.0908203125,
+                  380.8946838378906
+                ]
+              ]
+            },
+            {
+              "text": "FIRE SAFETY CERTIFICATE",
+              "confidence": 0.99567,
+              "box": [
+                [
+                  540.0340576171875,
+                  432.8830871582031
+                ],
+                [
+                  946.9090576171875,
+                  432.8830871582031
+                ],
+                [
+                  946.9090576171875,
+                  463.6517333984375
+                ],
+                [
+                  540.0340576171875,
+                  463.6517333984375
+                ]
+              ]
+            },
+            {
+              "text": "Certified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of",
+              "confidence": 0.98802,
+              "box": [
+                [
+                  72.92044830322266,
+                  520.945068359375
+                ],
+                [
+                  1417.193115234375,
+                  520.945068359375
+                ],
+                [
+                  1417.193115234375,
+                  551.7137451171875
+                ],
+                [
+                  72.92044830322266,
+                  551.7137451171875
+                ]
+              ]
+            },
+            {
+              "text": "Basement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper",
+              "confidence": 0.99845,
+              "box": [
+                [
+                  69.75,
+                  560.20166015625
+                ],
+                [
+                  1417.193115234375,
+                  561.2626342773438
+                ],
+                [
+                  1417.193115234375,
+                  593.09228515625
+                ],
+                [
+                  69.75,
+                  592.03125
+                ]
+              ]
+            },
+            {
+              "text": "floors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety",
+              "confidence": 0.98899,
+              "box": [
+                [
+                  69.75,
+                  601.5801391601562
+                ],
+                [
+                  1415.0794677734375,
+                  601.5801391601562
+                ],
+                [
+                  1415.0794677734375,
+                  632.3488159179688
+                ],
+                [
+                  69.75,
+                  632.3488159179688
+                ]
+              ]
+            },
+            {
+              "text": "requirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of",
+              "confidence": 0.99627,
+              "box": [
+                [
+                  69.75,
+                  640.8367309570312
+                ],
+                [
+                  1418.2498779296875,
+                  639.7757568359375
+                ],
+                [
+                  1418.2498779296875,
+                  670.5443725585938
+                ],
+                [
+                  69.75,
+                  671.6053466796875
+                ]
+              ]
+            },
+            {
+              "text": "Fire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy",
+              "confidence": 0.99648,
+              "box": [
+                [
+                  69.75,
+                  679.0322875976562
+                ],
+                [
+                  1416.13623046875,
+                  681.1542358398438
+                ],
+                [
+                  1416.13623046875,
+                  712.98388671875
+                ],
+                [
+                  69.75,
+                  710.8619384765625
+                ]
+              ]
+            },
+            {
+              "text": "class Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with",
+              "confidence": 0.98348,
+              "box": [
+                [
+                  71.86363220214844,
+                  720.4108276367188
+                ],
+                [
+                  1416.13623046875,
+                  720.4108276367188
+                ],
+                [
+                  1416.13623046875,
+                  751.179443359375
+                ],
+                [
+                  71.86363220214844,
+                  751.179443359375
+                ]
+              ]
+            },
+            {
+              "text": "Rule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions",
+              "confidence": 0.99304,
+              "box": [
+                [
+                  70.80681610107422,
+                  759.6673583984375
+                ],
+                [
+                  1416.13623046875,
+                  760.7283325195312
+                ],
+                [
+                  1416.13623046875,
+                  791.4970092773438
+                ],
+                [
+                  70.80681610107422,
+                  790.43603515625
+                ]
+              ]
+            },
+            {
+              "text": "under Rule 38 of the Delhi Fire Service Rules, 2010.",
+              "confidence": 0.99911,
+              "box": [
+                [
+                  71.86363220214844,
+                  801.0458984375
+                ],
+                [
+                  655.2272338867188,
+                  801.0458984375
+                ],
+                [
+                  655.2272338867188,
+                  831.8145751953125
+                ],
+                [
+                  71.86363220214844,
+                  831.8145751953125
+                ]
+              ]
+            },
+            {
+              "text": "Issued on 06-03-2026 at New Delhi by:",
+              "confidence": 0.98003,
+              "box": [
+                [
+                  71.86363220214844,
+                  876.3760375976562
+                ],
+                [
+                  529.4658813476562,
+                  876.3760375976562
+                ],
+                [
+                  529.4658813476562,
+                  907.1447143554688
+                ],
+                [
+                  71.86363220214844,
+                  907.1447143554688
+                ]
+              ]
+            },
+            {
+              "text": "A.K.Malik",
+              "confidence": 0.99991,
+              "box": [
+                [
+                  1291.4317626953125,
+                  903.9617309570312
+                ],
+                [
+                  1412.9658203125,
+                  903.9617309570312
+                ],
+                [
+                  1412.9658203125,
+                  935.7913818359375
+                ],
+                [
+                  1291.4317626953125,
+                  935.7913818359375
+                ]
+              ]
+            },
+            {
+              "text": "Dy.Chief Fire Officer",
+              "confidence": 0.98667,
+              "box": [
+                [
+                  1161.443115234375,
+                  945.3402709960938
+                ],
+                [
+                  1411.9090576171875,
+                  943.21826171875
+                ],
+                [
+                  1411.9090576171875,
+                  975.0479125976562
+                ],
+                [
+                  1161.443115234375,
+                  977.169921875
+                ]
+              ]
+            },
+            {
+              "text": "Copy to: The Concerned Local/Statutory Authority",
+              "confidence": 0.99991,
+              "box": [
+                [
+                  72.92044830322266,
+                  994.1456909179688
+                ],
+                [
+                  627.7499389648438,
+                  994.1456909179688
+                ],
+                [
+                  627.7499389648438,
+                  1024.914306640625
+                ],
+                [
+                  72.92044830322266,
+                  1024.914306640625
+                ]
+              ]
+            },
+            {
+              "text": "DFs",
+              "confidence": 0.86641,
+              "box": [
+                [
+                  670.022705078125,
+                  994.1456909179688
+                ],
+                [
+                  808.4658813476562,
+                  988.8407592773438
+                ],
+                [
+                  812.693115234375,
+                  1097.0615234375
+                ],
+                [
+                  674.2499389648438,
+                  1102.366455078125
+                ]
+              ]
+            },
+            {
+              "text": "Conditions for the validity of Fire Safety Certificate:",
+              "confidence": 0.99704,
+              "box": [
+                [
+                  71.86363220214844,
+                  1068.4149169921875
+                ],
+                [
+                  690.1022338867188,
+                  1068.4149169921875
+                ],
+                [
+                  690.1022338867188,
+                  1099.1834716796875
+                ],
+                [
+                  71.86363220214844,
+                  1099.1834716796875
+                ]
+              ]
+            },
+            {
+              "text": "1. All the means of escape/entry/exit shall be kept free from any obstruction.",
+              "confidence": 0.99425,
+              "box": [
+                [
+                  69.75,
+                  1104.4884033203125
+                ],
+                [
+                  941.6249389648438,
+                  1105.5494384765625
+                ],
+                [
+                  941.6249389648438,
+                  1137.3790283203125
+                ],
+                [
+                  69.75,
+                  1136.318115234375
+                ]
+              ]
+            },
+            {
+              "text": "2.",
+              "confidence": 0.7723,
+              "box": [
+                [
+                  69.75,
+                  1143.7449951171875
+                ],
+                [
+                  123.64772033691406,
+                  1143.7449951171875
+                ],
+                [
+                  123.64772033691406,
+                  1174.513671875
+                ],
+                [
+                  69.75,
+                  1174.513671875
+                ]
+              ]
+            },
+            {
+              "text": "All the employees shall be acquainted with the use and maintenance of all fire equipments and method of smooth,",
+              "confidence": 0.99055,
+              "box": [
+                [
+                  108.85226440429688,
+                  1143.7449951171875
+                ],
+                [
+                  1417.193115234375,
+                  1143.7449951171875
+                ],
+                [
+                  1417.193115234375,
+                  1174.513671875
+                ],
+                [
+                  108.85226440429688,
+                  1174.513671875
+                ]
+              ]
+            },
+            {
+              "text": "safe and speedy evacuation of occupants in case of emergency.",
+              "confidence": 0.99882,
+              "box": [
+                [
+                  119.42044830322266,
+                  1180.879638671875
+                ],
+                [
+                  840.17041015625,
+                  1181.9405517578125
+                ],
+                [
+                  840.17041015625,
+                  1213.770263671875
+                ],
+                [
+                  119.42044830322266,
+                  1212.709228515625
+                ]
+              ]
+            },
+            {
+              "text": "3.",
+              "confidence": 0.99984,
+              "box": [
+                [
+                  70.80681610107422,
+                  1219.0751953125
+                ],
+                [
+                  114.13636016845703,
+                  1219.0751953125
+                ],
+                [
+                  114.13636016845703,
+                  1247.7218017578125
+                ],
+                [
+                  70.80681610107422,
+                  1247.7218017578125
+                ]
+              ]
+            },
+            {
+              "text": "All the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering",
+              "confidence": 0.99111,
+              "box": [
+                [
+                  118.36363220214844,
+                  1219.0751953125
+                ],
+                [
+                  1414.022705078125,
+                  1219.0751953125
+                ],
+                [
+                  1414.022705078125,
+                  1249.84375
+                ],
+                [
+                  118.36363220214844,
+                  1249.84375
+                ]
+              ]
+            },
+            {
+              "text": "non-functional of fire safety measures, management shall be responsible.",
+              "confidence": 0.99963,
+              "box": [
+                [
+                  121.53408813476562,
+                  1256.209716796875
+                ],
+                [
+                  939.5112915039062,
+                  1256.209716796875
+                ],
+                [
+                  939.5112915039062,
+                  1286.9783935546875
+                ],
+                [
+                  121.53408813476562,
+                  1286.9783935546875
+                ]
+              ]
+            },
+            {
+              "text": "4.",
+              "confidence": 0.99998,
+              "box": [
+                [
+                  71.86363220214844,
+                  1295.46630859375
+                ],
+                [
+                  103.56817626953125,
+                  1295.46630859375
+                ],
+                [
+                  103.56817626953125,
+                  1321.990966796875
+                ],
+                [
+                  71.86363220214844,
+                  1321.990966796875
+                ]
+              ]
+            },
+            {
+              "text": "Anetr etn o  vo  ttt ttt to ttton tto osvet on ti fro",
+              "confidence": 0.52882,
+              "box": [
+                [
+                  119.42044830322266,
+                  1294.4052734375
+                ],
+                [
+                  1415.0794677734375,
+                  1294.4052734375
+                ],
+                [
+                  1415.0794677734375,
+                  1325.1739501953125
+                ],
+                [
+                  119.42044830322266,
+                  1325.1739501953125
+                ]
+              ]
+            },
+            {
+              "text": "the concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per",
+              "confidence": 0.99819,
+              "box": [
+                [
+                  119.42044830322266,
+                  1331.5399169921875
+                ],
+                [
+                  1417.193115234375,
+                  1331.5399169921875
+                ],
+                [
+                  1417.193115234375,
+                  1362.3084716796875
+                ],
+                [
+                  119.42044830322266,
+                  1362.3084716796875
+                ]
+              ]
+            },
+            {
+              "text": "inspection.",
+              "confidence": 0.99998,
+              "box": [
+                [
+                  120.47726440429688,
+                  1368.6744384765625
+                ],
+                [
+                  247.29544067382812,
+                  1368.6744384765625
+                ],
+                [
+                  247.29544067382812,
+                  1400.504150390625
+                ],
+                [
+                  120.47726440429688,
+                  1400.504150390625
+                ]
+              ]
+            },
+            {
+              "text": "5.",
+              "confidence": 0.99992,
+              "box": [
+                [
+                  69.75,
+                  1405.80908203125
+                ],
+                [
+                  104.62499237060547,
+                  1405.80908203125
+                ],
+                [
+                  104.62499237060547,
+                  1436.57763671875
+                ],
+                [
+                  69.75,
+                  1436.57763671875
+                ]
+              ]
+            },
+            {
+              "text": "This Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised",
+              "confidence": 0.99212,
+              "box": [
+                [
+                  119.42044830322266,
+                  1406.8699951171875
+                ],
+                [
+                  1416.13623046875,
+                  1406.8699951171875
+                ],
+                [
+                  1416.13623046875,
+                  1437.638671875
+                ],
+                [
+                  119.42044830322266,
+                  1437.638671875
+                ]
+              ]
+            },
+            {
+              "text": "occupancy, use of land, or activities etc.",
+              "confidence": 0.99874,
+              "box": [
+                [
+                  121.53408813476562,
+                  1444.004638671875
+                ],
+                [
+                  569.625,
+                  1444.004638671875
+                ],
+                [
+                  569.625,
+                  1474.773193359375
+                ],
+                [
+                  121.53408813476562,
+                  1474.773193359375
+                ]
+              ]
+            },
+            {
+              "text": "6.",
+              "confidence": 0.99987,
+              "box": [
+                [
+                  70.80681610107422,
+                  1480.0782470703125
+                ],
+                [
+                  108.85226440429688,
+                  1480.0782470703125
+                ],
+                [
+                  108.85226440429688,
+                  1510.8468017578125
+                ],
+                [
+                  70.80681610107422,
+                  1510.8468017578125
+                ]
+              ]
+            },
+            {
+              "text": "The owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire",
+              "confidence": 0.98696,
+              "box": [
+                [
+                  118.36363220214844,
+                  1481.13916015625
+                ],
+                [
+                  1416.13623046875,
+                  1481.13916015625
+                ],
+                [
+                  1416.13623046875,
+                  1511.9078369140625
+                ],
+                [
+                  118.36363220214844,
+                  1511.9078369140625
+                ]
+              ]
+            },
+            {
+              "text": "Service Rule 2010. The form is available on www.dfs.delhigovt.nic.in.",
+              "confidence": 0.9953,
+              "box": [
+                [
+                  121.53408813476562,
+                  1517.2127685546875
+                ],
+                [
+                  891.9545288085938,
+                  1518.2738037109375
+                ],
+                [
+                  891.9545288085938,
+                  1549.0423583984375
+                ],
+                [
+                  121.53408813476562,
+                  1547.9814453125
+                ]
+              ]
+            },
+            {
+              "text": "7.",
+              "confidence": 0.99992,
+              "box": [
+                [
+                  70.80681610107422,
+                  1556.4693603515625
+                ],
+                [
+                  108.85226440429688,
+                  1556.4693603515625
+                ],
+                [
+                  108.85226440429688,
+                  1586.177001953125
+                ],
+                [
+                  70.80681610107422,
+                  1586.177001953125
+                ]
+              ]
+            },
+            {
+              "text": "Tohe r(          t l    f   t t ot",
+              "confidence": 0.60592,
+              "box": [
+                [
+                  117.30680847167969,
+                  1556.4693603515625
+                ],
+                [
+                  1417.193115234375,
+                  1556.4693603515625
+                ],
+                [
+                  1417.193115234375,
+                  1587.2379150390625
+                ],
+                [
+                  117.30680847167969,
+                  1587.2379150390625
+                ]
+              ]
+            },
+            {
+              "text": "Rule (37) along with a copy of this Certificate, six months prior to its expiry.",
+              "confidence": 0.99222,
+              "box": [
+                [
+                  121.53408813476562,
+                  1594.6649169921875
+                ],
+                [
+                  953.2499389648438,
+                  1594.6649169921875
+                ],
+                [
+                  953.2499389648438,
+                  1625.43359375
+                ],
+                [
+                  121.53408813476562,
+                  1625.43359375
+                ]
+              ]
+            },
+            {
+              "text": "This certificate is computer generated and does not require signature.",
+              "confidence": 0.99846,
+              "box": [
+                [
+                  239.89772033691406,
+                  1814.2894287109375
+                ],
+                [
+                  1245.988525390625,
+                  1815.350341796875
+                ],
+                [
+                  1245.988525390625,
+                  1850.363037109375
+                ],
+                [
+                  239.89772033691406,
+                  1849.302001953125
+                ]
+              ]
+            }
+          ],
+          "dpi": 180,
+          "pdf_text_layer": null
+        }
+      ],
+      "source_sha256": "6edc113a6c0a27bf76bfb6528ed0816f170d1b96f5d732ee1656d4fb3e8e8766",
+      "started_at": "2026-10-29T10:51:36.644218+00:00",
+      "completed_at": "2026-10-29T10:51:46.149310+00:00",
+      "processing_parameters": {
+        "max_pages": 40,
+        "max_pixels_per_page": 24000000,
+        "date_locale": "en-IN",
+        "exif_orientation": true
+      }
+    },
+    "extracted_fields": {
+      "source_text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nDFs\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2.\nAll the employees shall be acquainted with the use and maintenance of all fire equipments and method of smooth,\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAnetr etn o  vo  ttt ttt to ttton tto osvet on ti fro\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nTohe r(          t l    f   t t ot\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+      "source_error": null,
+      "certificate_number": null,
+      "extracted_issue_date": "06-03-2026",
+      "extracted_expiry_date": null,
+      "issuing_authority": null,
+      "declared_issue_date": null,
+      "declared_expiry_date": null,
+      "field_evidence": {
+        "certificate_number": [],
+        "extracted_issue_date": [
+          {
+            "page": 1,
+            "mode": "pixel_ocr",
+            "value": "06-03-2026"
+          }
+        ],
+        "extracted_expiry_date": [],
+        "issuing_authority": []
+      }
+    }
+  },
+  {
+    "file": "output\\pdf\\ocr_manual_test\\official_certificate_page_1.png",
+    "status": "completed",
+    "source_text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nro  t      n           or\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2ms   e smne i  oe mo       m se  oih t\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAnetr etn o  yo  tt ttt ton ttton to rosvet ion t fro\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nThor (or     e t    t        t  oo\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+    "source_error": null,
+    "engine_name": "RapidOCR ONNX",
+    "engine_version": "3.10.0",
+    "confidence_summary": {
+      "overall_confidence": 0.9549192105263158,
+      "source": "RapidOCR ONNX",
+      "ocr_performed": true,
+      "pages": [
+        {
+          "page": 1,
+          "mode": "pixel_ocr",
+          "text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nro  t      n           or\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2ms   e smne i  oe mo       m se  oih t\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAnetr etn o  yo  tt ttt ton ttton to rosvet ion t fro\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nThor (or     e t    t        t  oo\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+          "confidence": 0.9549192105263158,
+          "engine": "RapidOCR ONNX",
+          "version": "3.10.0",
+          "regions": [
+            {
+              "text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI",
+              "confidence": 0.99703,
+              "box": [
+                [
+                  357.85723876953125,
+                  182.859375
+                ],
+                [
+                  1461.1427001953125,
+                  182.859375
+                ],
+                [
+                  1461.1427001953125,
+                  220.46875
+                ],
+                [
+                  357.85723876953125,
+                  220.46875
+                ]
+              ]
+            },
+            {
+              "text": "HEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001",
+              "confidence": 0.98714,
+              "box": [
+                [
+                  355.2734375,
+                  220.46875
+                ],
+                [
+                  1459.850830078125,
+                  220.46875
+                ],
+                [
+                  1459.850830078125,
+                  258.078125
+                ],
+                [
+                  355.2734375,
+                  258.078125
+                ]
+              ]
+            },
+            {
+              "text": "Application ID. 52026021801098",
+              "confidence": 0.99244,
+              "box": [
+                [
+                  94.30894470214844,
+                  431.859375
+                ],
+                [
+                  561.9779663085938,
+                  430.5625
+                ],
+                [
+                  561.9779663085938,
+                  469.46875
+                ],
+                [
+                  94.30894470214844,
+                  470.765625
+                ]
+              ]
+            },
+            {
+              "text": "Dated: 06-03-2026",
+              "confidence": 0.98107,
+              "box": [
+                [
+                  1457.2669677734375,
+                  431.859375
+                ],
+                [
+                  1722.107177734375,
+                  431.859375
+                ],
+                [
+                  1722.107177734375,
+                  465.578125
+                ],
+                [
+                  1457.2669677734375,
+                  465.578125
+                ]
+              ]
+            },
+            {
+              "text": "FIRE SAFETY CERTIFICATE",
+              "confidence": 0.99778,
+              "box": [
+                [
+                  660.16259765625,
+                  529.125
+                ],
+                [
+                  1158.8372802734375,
+                  529.125
+                ],
+                [
+                  1158.8372802734375,
+                  566.734375
+                ],
+                [
+                  660.16259765625,
+                  566.734375
+                ]
+              ]
+            },
+            {
+              "text": "Certified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of",
+              "confidence": 0.98896,
+              "box": [
+                [
+                  89.1413345336914,
+                  636.765625
+                ],
+                [
+                  1733.734375,
+                  636.765625
+                ],
+                [
+                  1733.734375,
+                  674.375
+                ],
+                [
+                  89.1413345336914,
+                  674.375
+                ]
+              ]
+            },
+            {
+              "text": "Basement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper",
+              "confidence": 0.99812,
+              "box": [
+                [
+                  85.265625,
+                  684.75
+                ],
+                [
+                  1732.4423828125,
+                  686.046875
+                ],
+                [
+                  1732.4423828125,
+                  724.953125
+                ],
+                [
+                  85.265625,
+                  723.65625
+                ]
+              ]
+            },
+            {
+              "text": "floors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety",
+              "confidence": 0.99031,
+              "box": [
+                [
+                  85.265625,
+                  735.328125
+                ],
+                [
+                  1729.858642578125,
+                  735.328125
+                ],
+                [
+                  1729.858642578125,
+                  772.9375
+                ],
+                [
+                  85.265625,
+                  772.9375
+                ]
+              ]
+            },
+            {
+              "text": "ro  t      n           or",
+              "confidence": 0.73411,
+              "box": [
+                [
+                  85.265625,
+                  783.3125
+                ],
+                [
+                  1733.734375,
+                  782.015625
+                ],
+                [
+                  1733.734375,
+                  819.625
+                ],
+                [
+                  85.265625,
+                  820.921875
+                ]
+              ]
+            },
+            {
+              "text": "Fire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy",
+              "confidence": 0.99383,
+              "box": [
+                [
+                  85.265625,
+                  831.296875
+                ],
+                [
+                  1731.1505126953125,
+                  832.59375
+                ],
+                [
+                  1731.1505126953125,
+                  871.5
+                ],
+                [
+                  85.265625,
+                  870.203125
+                ]
+              ]
+            },
+            {
+              "text": "class Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with",
+              "confidence": 0.98752,
+              "box": [
+                [
+                  87.84942626953125,
+                  883.171875
+                ],
+                [
+                  1729.858642578125,
+                  883.171875
+                ],
+                [
+                  1729.858642578125,
+                  916.890625
+                ],
+                [
+                  87.84942626953125,
+                  916.890625
+                ]
+              ]
+            },
+            {
+              "text": "Rule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions",
+              "confidence": 0.98776,
+              "box": [
+                [
+                  87.84942626953125,
+                  929.859375
+                ],
+                [
+                  1729.858642578125,
+                  931.15625
+                ],
+                [
+                  1729.858642578125,
+                  966.171875
+                ],
+                [
+                  87.84942626953125,
+                  964.875
+                ]
+              ]
+            },
+            {
+              "text": "under Rule 38 of the Delhi Fire Service Rules, 2010.",
+              "confidence": 0.9982,
+              "box": [
+                [
+                  89.1413345336914,
+                  980.4375
+                ],
+                [
+                  799.6881713867188,
+                  980.4375
+                ],
+                [
+                  799.6881713867188,
+                  1014.15625
+                ],
+                [
+                  89.1413345336914,
+                  1014.15625
+                ]
+              ]
+            },
+            {
+              "text": "Issued on 06-03-2026 at New Delhi by:",
+              "confidence": 0.97955,
+              "box": [
+                [
+                  87.84942626953125,
+                  1071.21875
+                ],
+                [
+                  647.2435913085938,
+                  1071.21875
+                ],
+                [
+                  647.2435913085938,
+                  1108.828125
+                ],
+                [
+                  87.84942626953125,
+                  1108.828125
+                ]
+              ]
+            },
+            {
+              "text": "A.K.Malik",
+              "confidence": 0.99996,
+              "box": [
+                [
+                  1578.7059326171875,
+                  1104.9375
+                ],
+                [
+                  1727.2747802734375,
+                  1104.9375
+                ],
+                [
+                  1727.2747802734375,
+                  1143.84375
+                ],
+                [
+                  1578.7059326171875,
+                  1143.84375
+                ]
+              ]
+            },
+            {
+              "text": "Dy.Chief Fire Officer",
+              "confidence": 0.97838,
+              "box": [
+                [
+                  1422.3856201171875,
+                  1158.109375
+                ],
+                [
+                  1724.6910400390625,
+                  1158.109375
+                ],
+                [
+                  1724.6910400390625,
+                  1193.125
+                ],
+                [
+                  1422.3856201171875,
+                  1193.125
+                ]
+              ]
+            },
+            {
+              "text": "Copy to: The Concerned Local/Statutory Authority",
+              "confidence": 0.99982,
+              "box": [
+                [
+                  89.1413345336914,
+                  1215.171875
+                ],
+                [
+                  767.390625,
+                  1215.171875
+                ],
+                [
+                  767.390625,
+                  1252.78125
+                ],
+                [
+                  89.1413345336914,
+                  1252.78125
+                ]
+              ]
+            },
+            {
+              "text": "Conditions for the validity of Fire Safety Certificate:",
+              "confidence": 0.98957,
+              "box": [
+                [
+                  87.84942626953125,
+                  1305.953125
+                ],
+                [
+                  843.6129150390625,
+                  1305.953125
+                ],
+                [
+                  843.6129150390625,
+                  1343.5625
+                ],
+                [
+                  87.84942626953125,
+                  1343.5625
+                ]
+              ]
+            },
+            {
+              "text": "1. All the means of escape/entry/exit shall be kept free from any obstruction.",
+              "confidence": 0.98602,
+              "box": [
+                [
+                  86.55752563476562,
+                  1352.640625
+                ],
+                [
+                  1151.0859375,
+                  1352.640625
+                ],
+                [
+                  1151.0859375,
+                  1390.25
+                ],
+                [
+                  86.55752563476562,
+                  1390.25
+                ]
+              ]
+            },
+            {
+              "text": "2ms   e smne i  oe mo       m se  oih t",
+              "confidence": 0.62656,
+              "box": [
+                [
+                  82.68181610107422,
+                  1395.4375
+                ],
+                [
+                  1733.734375,
+                  1395.4375
+                ],
+                [
+                  1733.734375,
+                  1436.9375
+                ],
+                [
+                  82.68181610107422,
+                  1436.9375
+                ]
+              ]
+            },
+            {
+              "text": "safe and speedy evacuation of occupants in case of emergency.",
+              "confidence": 0.99946,
+              "box": [
+                [
+                  145.98507690429688,
+                  1443.421875
+                ],
+                [
+                  1025.771240234375,
+                  1444.71875
+                ],
+                [
+                  1025.771240234375,
+                  1483.625
+                ],
+                [
+                  145.98507690429688,
+                  1482.328125
+                ]
+              ]
+            },
+            {
+              "text": "3.",
+              "confidence": 0.99971,
+              "box": [
+                [
+                  86.55752563476562,
+                  1490.109375
+                ],
+                [
+                  143.40127563476562,
+                  1490.109375
+                ],
+                [
+                  143.40127563476562,
+                  1525.125
+                ],
+                [
+                  86.55752563476562,
+                  1525.125
+                ]
+              ]
+            },
+            {
+              "text": "All the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering",
+              "confidence": 0.98976,
+              "box": [
+                [
+                  142.109375,
+                  1490.109375
+                ],
+                [
+                  1729.858642578125,
+                  1490.109375
+                ],
+                [
+                  1729.858642578125,
+                  1527.71875
+                ],
+                [
+                  142.109375,
+                  1527.71875
+                ]
+              ]
+            },
+            {
+              "text": "non-functional of fire safety measures, management shall be responsible.",
+              "confidence": 0.99956,
+              "box": [
+                [
+                  148.5688934326172,
+                  1535.5
+                ],
+                [
+                  1148.5020751953125,
+                  1535.5
+                ],
+                [
+                  1148.5020751953125,
+                  1573.109375
+                ],
+                [
+                  148.5688934326172,
+                  1573.109375
+                ]
+              ]
+            },
+            {
+              "text": "4.",
+              "confidence": 0.99997,
+              "box": [
+                [
+                  90.43323516845703,
+                  1579.59375
+                ],
+                [
+                  129.19033813476562,
+                  1586.078125
+                ],
+                [
+                  124.02272033691406,
+                  1618.5
+                ],
+                [
+                  85.265625,
+                  1612.015625
+                ]
+              ]
+            },
+            {
+              "text": "Anetr etn o  yo  tt ttt ton ttton to rosvet ion t fro",
+              "confidence": 0.52712,
+              "box": [
+                [
+                  145.98507690429688,
+                  1582.1875
+                ],
+                [
+                  1729.858642578125,
+                  1582.1875
+                ],
+                [
+                  1729.858642578125,
+                  1619.796875
+                ],
+                [
+                  145.98507690429688,
+                  1619.796875
+                ]
+              ]
+            },
+            {
+              "text": "the concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per",
+              "confidence": 0.99262,
+              "box": [
+                [
+                  147.2769775390625,
+                  1627.578125
+                ],
+                [
+                  1732.4423828125,
+                  1627.578125
+                ],
+                [
+                  1732.4423828125,
+                  1665.1875
+                ],
+                [
+                  147.2769775390625,
+                  1665.1875
+                ]
+              ]
+            },
+            {
+              "text": "inspection.",
+              "confidence": 0.99997,
+              "box": [
+                [
+                  147.2769775390625,
+                  1672.96875
+                ],
+                [
+                  302.3053894042969,
+                  1672.96875
+                ],
+                [
+                  302.3053894042969,
+                  1711.875
+                ],
+                [
+                  147.2769775390625,
+                  1711.875
+                ]
+              ]
+            },
+            {
+              "text": "5.",
+              "confidence": 0.99995,
+              "box": [
+                [
+                  86.55752563476562,
+                  1720.953125
+                ],
+                [
+                  126.60652923583984,
+                  1720.953125
+                ],
+                [
+                  126.60652923583984,
+                  1754.671875
+                ],
+                [
+                  86.55752563476562,
+                  1754.671875
+                ]
+              ]
+            },
+            {
+              "text": "This Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised",
+              "confidence": 0.98983,
+              "box": [
+                [
+                  145.98507690429688,
+                  1719.65625
+                ],
+                [
+                  1732.4423828125,
+                  1719.65625
+                ],
+                [
+                  1732.4423828125,
+                  1757.265625
+                ],
+                [
+                  145.98507690429688,
+                  1757.265625
+                ]
+              ]
+            },
+            {
+              "text": "occupancy, use of land, or activities etc.",
+              "confidence": 0.99097,
+              "box": [
+                [
+                  148.5688934326172,
+                  1765.046875
+                ],
+                [
+                  696.3359375,
+                  1765.046875
+                ],
+                [
+                  696.3359375,
+                  1802.65625
+                ],
+                [
+                  148.5688934326172,
+                  1802.65625
+                ]
+              ]
+            },
+            {
+              "text": "6.",
+              "confidence": 0.99992,
+              "box": [
+                [
+                  86.55752563476562,
+                  1809.140625
+                ],
+                [
+                  131.77413940429688,
+                  1809.140625
+                ],
+                [
+                  131.77413940429688,
+                  1846.75
+                ],
+                [
+                  86.55752563476562,
+                  1846.75
+                ]
+              ]
+            },
+            {
+              "text": "The owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire",
+              "confidence": 0.98548,
+              "box": [
+                [
+                  144.69317626953125,
+                  1810.4375
+                ],
+                [
+                  1731.1505126953125,
+                  1810.4375
+                ],
+                [
+                  1731.1505126953125,
+                  1848.046875
+                ],
+                [
+                  144.69317626953125,
+                  1848.046875
+                ]
+              ]
+            },
+            {
+              "text": "Service Rule 2010. The form is available on www.dfs.delhigovt.nic.in.",
+              "confidence": 0.99192,
+              "box": [
+                [
+                  148.5688934326172,
+                  1854.53125
+                ],
+                [
+                  1089.0745849609375,
+                  1855.828125
+                ],
+                [
+                  1089.0745849609375,
+                  1893.4375
+                ],
+                [
+                  148.5688934326172,
+                  1892.140625
+                ]
+              ]
+            },
+            {
+              "text": "7.",
+              "confidence": 0.99995,
+              "box": [
+                [
+                  86.55752563476562,
+                  1902.515625
+                ],
+                [
+                  131.77413940429688,
+                  1902.515625
+                ],
+                [
+                  131.77413940429688,
+                  1938.828125
+                ],
+                [
+                  86.55752563476562,
+                  1938.828125
+                ]
+              ]
+            },
+            {
+              "text": "Thor (or     e t    t        t  oo",
+              "confidence": 0.64342,
+              "box": [
+                [
+                  144.69317626953125,
+                  1902.515625
+                ],
+                [
+                  1733.734375,
+                  1902.515625
+                ],
+                [
+                  1733.734375,
+                  1940.125
+                ],
+                [
+                  144.69317626953125,
+                  1940.125
+                ]
+              ]
+            },
+            {
+              "text": "Rule (37) along with a copy of this Certificate, six months prior to its expiry.",
+              "confidence": 0.98723,
+              "box": [
+                [
+                  148.5688934326172,
+                  1949.203125
+                ],
+                [
+                  1165.296875,
+                  1949.203125
+                ],
+                [
+                  1165.296875,
+                  1986.8125
+                ],
+                [
+                  148.5688934326172,
+                  1986.8125
+                ]
+              ]
+            },
+            {
+              "text": "This certificate is computer generated and does not require signature.",
+              "confidence": 0.99596,
+              "box": [
+                [
+                  293.2620544433594,
+                  2217.65625
+                ],
+                [
+                  1523.154052734375,
+                  2218.953125
+                ],
+                [
+                  1523.154052734375,
+                  2261.75
+                ],
+                [
+                  293.2620544433594,
+                  2260.453125
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "source_sha256": "0462a7da64d5ed37976492fbb4ac2a670ef9663c110a30527eb5ed2c47000124",
+      "started_at": "2026-10-29T10:51:46.151292+00:00",
+      "completed_at": "2026-10-29T10:51:55.730007+00:00",
+      "processing_parameters": {
+        "max_pages": 40,
+        "max_pixels_per_page": 24000000,
+        "date_locale": "en-IN",
+        "exif_orientation": true
+      }
+    },
+    "extracted_fields": {
+      "source_text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nro  t      n           or\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2ms   e smne i  oe mo       m se  oih t\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAnetr etn o  yo  tt ttt ton ttton to rosvet ion t fro\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nThor (or     e t    t        t  oo\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+      "source_error": null,
+      "certificate_number": null,
+      "extracted_issue_date": "06-03-2026",
+      "extracted_expiry_date": null,
+      "issuing_authority": null,
+      "declared_issue_date": null,
+      "declared_expiry_date": null,
+      "field_evidence": {
+        "certificate_number": [],
+        "extracted_issue_date": [
+          {
+            "page": 1,
+            "mode": "pixel_ocr",
+            "value": "06-03-2026"
+          }
+        ],
+        "extracted_expiry_date": [],
+        "issuing_authority": []
+      }
+    }
+  },
+  {
+    "file": "output\\pdf\\ocr_manual_test\\official_delhi_fire_safety_certificate.pdf",
+    "status": "completed",
+    "source_text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2.\nAms  os  se i i  ms  n      s  oth\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAny deviation, with regards to construction, ventilation, occupancy, electric installation etc. may be got verified from\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nThr r          t l    f   t rt ot\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+    "source_error": null,
+    "engine_name": "RapidOCR ONNX",
+    "engine_version": "3.10.0",
+    "confidence_summary": {
+      "overall_confidence": 0.9756128205128206,
+      "source": "RapidOCR ONNX",
+      "ocr_performed": true,
+      "pages": [
+        {
+          "page": 1,
+          "mode": "pixel_ocr",
+          "text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2.\nAms  os  se i i  ms  n      s  oth\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAny deviation, with regards to construction, ventilation, occupancy, electric installation etc. may be got verified from\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nThr r          t l    f   t rt ot\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+          "confidence": 0.9756128205128206,
+          "engine": "RapidOCR ONNX",
+          "version": "3.10.0",
+          "regions": [
+            {
+              "text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI",
+              "confidence": 0.99173,
+              "box": [
+                [
+                  292.7386169433594,
+                  149.59930419921875
+                ],
+                [
+                  1195.2613525390625,
+                  149.59930419921875
+                ],
+                [
+                  1195.2613525390625,
+                  180.36795043945312
+                ],
+                [
+                  292.7386169433594,
+                  180.36795043945312
+                ]
+              ]
+            },
+            {
+              "text": "HEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001",
+              "confidence": 0.98241,
+              "box": [
+                [
+                  289.56817626953125,
+                  178.2459716796875
+                ],
+                [
+                  1192.0908203125,
+                  178.2459716796875
+                ],
+                [
+                  1192.0908203125,
+                  209.01463317871094
+                ],
+                [
+                  289.56817626953125,
+                  209.01463317871094
+                ]
+              ]
+            },
+            {
+              "text": "Application ID. 52026021801098",
+              "confidence": 0.99652,
+              "box": [
+                [
+                  78.20454406738281,
+                  352.24798583984375
+                ],
+                [
+                  459.71588134765625,
+                  352.24798583984375
+                ],
+                [
+                  459.71588134765625,
+                  383.01666259765625
+                ],
+                [
+                  78.20454406738281,
+                  383.01666259765625
+                ]
+              ]
+            },
+            {
+              "text": "Dated: 06-03-2026",
+              "confidence": 0.98344,
+              "box": [
+                [
+                  1191.0340576171875,
+                  353.3089904785156
+                ],
+                [
+                  1409.79541015625,
+                  353.3089904785156
+                ],
+                [
+                  1409.79541015625,
+                  380.8946838378906
+                ],
+                [
+                  1191.0340576171875,
+                  380.8946838378906
+                ]
+              ]
+            },
+            {
+              "text": "FIRE SAFETY CERTIFICATE",
+              "confidence": 0.99843,
+              "box": [
+                [
+                  540.0340576171875,
+                  432.8830871582031
+                ],
+                [
+                  947.9658813476562,
+                  432.8830871582031
+                ],
+                [
+                  947.9658813476562,
+                  463.6517333984375
+                ],
+                [
+                  540.0340576171875,
+                  463.6517333984375
+                ]
+              ]
+            },
+            {
+              "text": "Certified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of",
+              "confidence": 0.99013,
+              "box": [
+                [
+                  72.92044830322266,
+                  520.945068359375
+                ],
+                [
+                  1417.193115234375,
+                  520.945068359375
+                ],
+                [
+                  1417.193115234375,
+                  551.7137451171875
+                ],
+                [
+                  72.92044830322266,
+                  551.7137451171875
+                ]
+              ]
+            },
+            {
+              "text": "Basement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper",
+              "confidence": 0.99721,
+              "box": [
+                [
+                  69.75,
+                  560.20166015625
+                ],
+                [
+                  1416.13623046875,
+                  561.2626342773438
+                ],
+                [
+                  1416.13623046875,
+                  593.09228515625
+                ],
+                [
+                  69.75,
+                  592.03125
+                ]
+              ]
+            },
+            {
+              "text": "floors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety",
+              "confidence": 0.98817,
+              "box": [
+                [
+                  69.75,
+                  601.5801391601562
+                ],
+                [
+                  1415.0794677734375,
+                  601.5801391601562
+                ],
+                [
+                  1415.0794677734375,
+                  632.3488159179688
+                ],
+                [
+                  69.75,
+                  632.3488159179688
+                ]
+              ]
+            },
+            {
+              "text": "requirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of",
+              "confidence": 0.99379,
+              "box": [
+                [
+                  70.80681610107422,
+                  640.8367309570312
+                ],
+                [
+                  1417.193115234375,
+                  640.8367309570312
+                ],
+                [
+                  1417.193115234375,
+                  671.6053466796875
+                ],
+                [
+                  70.80681610107422,
+                  671.6053466796875
+                ]
+              ]
+            },
+            {
+              "text": "Fire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy",
+              "confidence": 0.9923,
+              "box": [
+                [
+                  69.75,
+                  680.09326171875
+                ],
+                [
+                  1416.13623046875,
+                  681.1542358398438
+                ],
+                [
+                  1416.13623046875,
+                  712.98388671875
+                ],
+                [
+                  69.75,
+                  711.9229125976562
+                ]
+              ]
+            },
+            {
+              "text": "class Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with",
+              "confidence": 0.98536,
+              "box": [
+                [
+                  71.86363220214844,
+                  720.4108276367188
+                ],
+                [
+                  1416.13623046875,
+                  720.4108276367188
+                ],
+                [
+                  1416.13623046875,
+                  751.179443359375
+                ],
+                [
+                  71.86363220214844,
+                  751.179443359375
+                ]
+              ]
+            },
+            {
+              "text": "Rule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions",
+              "confidence": 0.99096,
+              "box": [
+                [
+                  71.86363220214844,
+                  761.7893676757812
+                ],
+                [
+                  1416.13623046875,
+                  761.7893676757812
+                ],
+                [
+                  1416.13623046875,
+                  792.5579833984375
+                ],
+                [
+                  71.86363220214844,
+                  792.5579833984375
+                ]
+              ]
+            },
+            {
+              "text": "under Rule 38 of the Delhi Fire Service Rules, 2010.",
+              "confidence": 0.99844,
+              "box": [
+                [
+                  72.92044830322266,
+                  803.1679077148438
+                ],
+                [
+                  654.17041015625,
+                  803.1679077148438
+                ],
+                [
+                  654.17041015625,
+                  830.7535400390625
+                ],
+                [
+                  72.92044830322266,
+                  830.7535400390625
+                ]
+              ]
+            },
+            {
+              "text": "Issued on 06-03-2026 at New Delhi by:",
+              "confidence": 0.99557,
+              "box": [
+                [
+                  71.86363220214844,
+                  876.3760375976562
+                ],
+                [
+                  529.4658813476562,
+                  876.3760375976562
+                ],
+                [
+                  529.4658813476562,
+                  907.1447143554688
+                ],
+                [
+                  71.86363220214844,
+                  907.1447143554688
+                ]
+              ]
+            },
+            {
+              "text": "A.K.Malik",
+              "confidence": 0.99989,
+              "box": [
+                [
+                  1290.3748779296875,
+                  905.022705078125
+                ],
+                [
+                  1412.9658203125,
+                  905.022705078125
+                ],
+                [
+                  1412.9658203125,
+                  936.8523559570312
+                ],
+                [
+                  1290.3748779296875,
+                  936.8523559570312
+                ]
+              ]
+            },
+            {
+              "text": "Dy.Chief Fire Officer",
+              "confidence": 0.98003,
+              "box": [
+                [
+                  1163.5567626953125,
+                  947.4622192382812
+                ],
+                [
+                  1410.8521728515625,
+                  947.4622192382812
+                ],
+                [
+                  1410.8521728515625,
+                  976.10888671875
+                ],
+                [
+                  1163.5567626953125,
+                  976.10888671875
+                ]
+              ]
+            },
+            {
+              "text": "Copy to: The Concerned Local/Statutory Authority",
+              "confidence": 0.99987,
+              "box": [
+                [
+                  72.92044830322266,
+                  994.1456909179688
+                ],
+                [
+                  627.7499389648438,
+                  994.1456909179688
+                ],
+                [
+                  627.7499389648438,
+                  1024.914306640625
+                ],
+                [
+                  72.92044830322266,
+                  1024.914306640625
+                ]
+              ]
+            },
+            {
+              "text": "Conditions for the validity of Fire Safety Certificate:",
+              "confidence": 0.99314,
+              "box": [
+                [
+                  71.86363220214844,
+                  1068.4149169921875
+                ],
+                [
+                  691.1590576171875,
+                  1068.4149169921875
+                ],
+                [
+                  691.1590576171875,
+                  1099.1834716796875
+                ],
+                [
+                  71.86363220214844,
+                  1099.1834716796875
+                ]
+              ]
+            },
+            {
+              "text": "1. All the means of escape/entry/exit shall be kept free from any obstruction.",
+              "confidence": 0.99466,
+              "box": [
+                [
+                  69.75,
+                  1104.4884033203125
+                ],
+                [
+                  941.6249389648438,
+                  1105.5494384765625
+                ],
+                [
+                  941.6249389648438,
+                  1137.3790283203125
+                ],
+                [
+                  69.75,
+                  1136.318115234375
+                ]
+              ]
+            },
+            {
+              "text": "2.",
+              "confidence": 0.9998,
+              "box": [
+                [
+                  70.80681610107422,
+                  1144.8060302734375
+                ],
+                [
+                  122.59090423583984,
+                  1144.8060302734375
+                ],
+                [
+                  122.59090423583984,
+                  1172.3917236328125
+                ],
+                [
+                  70.80681610107422,
+                  1172.3917236328125
+                ]
+              ]
+            },
+            {
+              "text": "Ams  os  se i i  ms  n      s  oth",
+              "confidence": 0.64302,
+              "box": [
+                [
+                  110.96590423583984,
+                  1143.7449951171875
+                ],
+                [
+                  1417.193115234375,
+                  1143.7449951171875
+                ],
+                [
+                  1417.193115234375,
+                  1174.513671875
+                ],
+                [
+                  110.96590423583984,
+                  1174.513671875
+                ]
+              ]
+            },
+            {
+              "text": "safe and speedy evacuation of occupants in case of emergency.",
+              "confidence": 0.99899,
+              "box": [
+                [
+                  121.53408813476562,
+                  1181.9405517578125
+                ],
+                [
+                  839.1135864257812,
+                  1181.9405517578125
+                ],
+                [
+                  839.1135864257812,
+                  1212.709228515625
+                ],
+                [
+                  121.53408813476562,
+                  1212.709228515625
+                ]
+              ]
+            },
+            {
+              "text": "3.",
+              "confidence": 0.9996,
+              "box": [
+                [
+                  70.80681610107422,
+                  1219.0751953125
+                ],
+                [
+                  114.13636016845703,
+                  1219.0751953125
+                ],
+                [
+                  114.13636016845703,
+                  1248.7828369140625
+                ],
+                [
+                  70.80681610107422,
+                  1248.7828369140625
+                ]
+              ]
+            },
+            {
+              "text": "All the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering",
+              "confidence": 0.99397,
+              "box": [
+                [
+                  118.36363220214844,
+                  1219.0751953125
+                ],
+                [
+                  1415.0794677734375,
+                  1219.0751953125
+                ],
+                [
+                  1415.0794677734375,
+                  1249.84375
+                ],
+                [
+                  118.36363220214844,
+                  1249.84375
+                ]
+              ]
+            },
+            {
+              "text": "non-functional of fire safety measures, management shall be responsible.",
+              "confidence": 0.99511,
+              "box": [
+                [
+                  120.47726440429688,
+                  1256.209716796875
+                ],
+                [
+                  939.5112915039062,
+                  1255.1488037109375
+                ],
+                [
+                  939.5112915039062,
+                  1286.9783935546875
+                ],
+                [
+                  120.47726440429688,
+                  1288.0394287109375
+                ]
+              ]
+            },
+            {
+              "text": "4.",
+              "confidence": 0.99998,
+              "box": [
+                [
+                  71.86363220214844,
+                  1295.46630859375
+                ],
+                [
+                  103.56817626953125,
+                  1295.46630859375
+                ],
+                [
+                  103.56817626953125,
+                  1321.990966796875
+                ],
+                [
+                  71.86363220214844,
+                  1321.990966796875
+                ]
+              ]
+            },
+            {
+              "text": "Any deviation, with regards to construction, ventilation, occupancy, electric installation etc. may be got verified from",
+              "confidence": 0.99213,
+              "box": [
+                [
+                  119.42044830322266,
+                  1294.4052734375
+                ],
+                [
+                  1416.13623046875,
+                  1294.4052734375
+                ],
+                [
+                  1416.13623046875,
+                  1325.1739501953125
+                ],
+                [
+                  119.42044830322266,
+                  1325.1739501953125
+                ]
+              ]
+            },
+            {
+              "text": "the concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per",
+              "confidence": 0.99329,
+              "box": [
+                [
+                  120.47726440429688,
+                  1331.5399169921875
+                ],
+                [
+                  1417.193115234375,
+                  1331.5399169921875
+                ],
+                [
+                  1417.193115234375,
+                  1362.3084716796875
+                ],
+                [
+                  120.47726440429688,
+                  1362.3084716796875
+                ]
+              ]
+            },
+            {
+              "text": "inspection.",
+              "confidence": 0.99998,
+              "box": [
+                [
+                  120.47726440429688,
+                  1368.6744384765625
+                ],
+                [
+                  247.29544067382812,
+                  1368.6744384765625
+                ],
+                [
+                  247.29544067382812,
+                  1400.504150390625
+                ],
+                [
+                  120.47726440429688,
+                  1400.504150390625
+                ]
+              ]
+            },
+            {
+              "text": "5.",
+              "confidence": 0.99991,
+              "box": [
+                [
+                  69.75,
+                  1405.80908203125
+                ],
+                [
+                  104.62499237060547,
+                  1405.80908203125
+                ],
+                [
+                  104.62499237060547,
+                  1436.57763671875
+                ],
+                [
+                  69.75,
+                  1436.57763671875
+                ]
+              ]
+            },
+            {
+              "text": "This Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised",
+              "confidence": 0.99486,
+              "box": [
+                [
+                  119.42044830322266,
+                  1406.8699951171875
+                ],
+                [
+                  1417.193115234375,
+                  1406.8699951171875
+                ],
+                [
+                  1417.193115234375,
+                  1437.638671875
+                ],
+                [
+                  119.42044830322266,
+                  1437.638671875
+                ]
+              ]
+            },
+            {
+              "text": "occupancy, use of land, or activities etc.",
+              "confidence": 0.98863,
+              "box": [
+                [
+                  121.53408813476562,
+                  1445.0655517578125
+                ],
+                [
+                  568.5681762695312,
+                  1444.004638671875
+                ],
+                [
+                  568.5681762695312,
+                  1472.6512451171875
+                ],
+                [
+                  121.53408813476562,
+                  1473.7122802734375
+                ]
+              ]
+            },
+            {
+              "text": "6.",
+              "confidence": 0.99996,
+              "box": [
+                [
+                  70.80681610107422,
+                  1481.13916015625
+                ],
+                [
+                  104.62499237060547,
+                  1481.13916015625
+                ],
+                [
+                  104.62499237060547,
+                  1511.9078369140625
+                ],
+                [
+                  70.80681610107422,
+                  1511.9078369140625
+                ]
+              ]
+            },
+            {
+              "text": "The owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire",
+              "confidence": 0.99249,
+              "box": [
+                [
+                  117.30680847167969,
+                  1480.0782470703125
+                ],
+                [
+                  1417.193115234375,
+                  1480.0782470703125
+                ],
+                [
+                  1417.193115234375,
+                  1514.02978515625
+                ],
+                [
+                  117.30680847167969,
+                  1514.02978515625
+                ]
+              ]
+            },
+            {
+              "text": "Service Rule 2010. The form is available on www.dfs.delhigovt.nic.in.",
+              "confidence": 0.99848,
+              "box": [
+                [
+                  120.47726440429688,
+                  1517.2127685546875
+                ],
+                [
+                  891.9545288085938,
+                  1518.2738037109375
+                ],
+                [
+                  891.9545288085938,
+                  1549.0423583984375
+                ],
+                [
+                  120.47726440429688,
+                  1547.9814453125
+                ]
+              ]
+            },
+            {
+              "text": "7.",
+              "confidence": 0.99995,
+              "box": [
+                [
+                  70.80681610107422,
+                  1556.4693603515625
+                ],
+                [
+                  107.79544830322266,
+                  1556.4693603515625
+                ],
+                [
+                  107.79544830322266,
+                  1586.177001953125
+                ],
+                [
+                  70.80681610107422,
+                  1586.177001953125
+                ]
+              ]
+            },
+            {
+              "text": "Thr r          t l    f   t rt ot",
+              "confidence": 0.62404,
+              "box": [
+                [
+                  118.36363220214844,
+                  1556.4693603515625
+                ],
+                [
+                  1417.193115234375,
+                  1556.4693603515625
+                ],
+                [
+                  1417.193115234375,
+                  1587.2379150390625
+                ],
+                [
+                  118.36363220214844,
+                  1587.2379150390625
+                ]
+              ]
+            },
+            {
+              "text": "Rule (37) along with a copy of this Certificate, six months prior to its expiry.",
+              "confidence": 0.9873,
+              "box": [
+                [
+                  121.53408813476562,
+                  1593.6038818359375
+                ],
+                [
+                  952.193115234375,
+                  1593.6038818359375
+                ],
+                [
+                  952.193115234375,
+                  1624.37255859375
+                ],
+                [
+                  121.53408813476562,
+                  1624.37255859375
+                ]
+              ]
+            },
+            {
+              "text": "This certificate is computer generated and does not require signature.",
+              "confidence": 0.99536,
+              "box": [
+                [
+                  242.0113525390625,
+                  1815.350341796875
+                ],
+                [
+                  1245.988525390625,
+                  1815.350341796875
+                ],
+                [
+                  1245.988525390625,
+                  1850.363037109375
+                ],
+                [
+                  242.0113525390625,
+                  1850.363037109375
+                ]
+              ]
+            }
+          ],
+          "dpi": 180,
+          "pdf_text_layer": "1.\n2.\n3.\n4.\n5.\n6.\n7.\n \n \nFIRE SAFETY CERTIFICATE\n \nCertified that the Hari Vidhya  Bhawan School  at K- II/600, Sangam Vihar, New Delhi - 110080  comprised of\nBasement in front portion only, Ground plus three upper floors   occupancy running at Ground plus three upper\nfloors  owned/occupied by Hari Vidhya  Bhawan School  have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar  and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1  with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\n \nIssued on 06-03-2026 at New Delhi by:\nCopy to: The Concerned Local/Statutory Authority\n \nConditions for the validity of Fire Safety Certificate:\nAll the means of escape/entry/exit shall be kept free from any obstruction.\nAll the employees shall be acquainted with the use and maintenance of all fire equipments and method of smooth,\nsafe and speedy evacuation of occupants in case of emergency.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\nAny deviation, with regards to construction, ventilation, occupancy, electric installation etc. may be got verified from\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\nThe owner / occupier shall apply for renewal of this Fire Safety Certificate to the Director in Form 'J' sub Rule (1) of\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\n \n \n \n \nThis certificate is computer generated and does not require signature.\nGOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098 Dated: 06-03-2026\nA.K.Malik\nDy.Chief Fire Officer"
+        }
+      ],
+      "source_sha256": "6500b999d34d50aef1da3e7f1be5ec3e9c6acd94e28078416392b9fae4d2496c",
+      "started_at": "2026-10-29T10:51:55.731643+00:00",
+      "completed_at": "2026-10-29T10:52:04.662551+00:00",
+      "processing_parameters": {
+        "max_pages": 40,
+        "max_pixels_per_page": 24000000,
+        "date_locale": "en-IN",
+        "exif_orientation": true
+      }
+    },
+    "extracted_fields": {
+      "source_text": "GOVERNMENT OF NATIONAL CAPITAL TERRITORY OF DELHI\nHEADQUARTERS: DELHI FIRE SERVICE: NEW DELHI – 110001\nApplication ID. 52026021801098\nDated: 06-03-2026\nFIRE SAFETY CERTIFICATE\nCertified that the Hari Vidhya Bhawan School at K- Il/600, Sangam Vihar, New Delhi - 110080 comprised of\nBasement in front portion only, Ground plus three upper floors occupancy running at Ground plus three upper\nfloors owned/occupied by Hari Vidhya Bhawan School have complied with the fire prevention and fire safety\nrequirements in accordance with Rule 33 of the Delhi Fire Service Rules, 2010 and verified by the officers concerned of\nFire Service on 25/02/2026 in the presence of Mr. Sushil Dhankar and that the building/premises is fit for occupancy\nclass Group B Educational : Sub-Division B-1 with effect from 06-03-2026 for a period of 3 Years in accordance with\nRule 36 unless renewed under Rule 37 or sooner cancelled under Rule 40 and subject to compliance of the conditions\nunder Rule 38 of the Delhi Fire Service Rules, 2010.\nIssued on 06-03-2026 at New Delhi by:\nA.K.Malik\nDy.Chief Fire Officer\nCopy to: The Concerned Local/Statutory Authority\nConditions for the validity of Fire Safety Certificate:\n1. All the means of escape/entry/exit shall be kept free from any obstruction.\n2.\nAms  os  se i i  ms  n      s  oth\nsafe and speedy evacuation of occupants in case of emergency.\n3.\nAll the fire fighting equipments shall be maintained in perfect working condition all the time and any lapse rendering\nnon-functional of fire safety measures, management shall be responsible.\n4.\nAny deviation, with regards to construction, ventilation, occupancy, electric installation etc. may be got verified from\nthe concerned authorities. This Fire Safety Certificate is valid only for permanent building structure as per\ninspection.\n5.\nThis Fire Safety Certificate shall not be used for regularisation of unauthorised building construction/ unauthorised\noccupancy, use of land, or activities etc.\n6.\nThe owner / occupier shall submit a declaration every year in form 'K' provided in the first schedule of Delhi Fire\nService Rule 2010. The form is available on www.dfs.delhigovt.nic.in.\n7.\nThr r          t l    f   t rt ot\nRule (37) along with a copy of this Certificate, six months prior to its expiry.\nThis certificate is computer generated and does not require signature.",
+      "source_error": null,
+      "certificate_number": null,
+      "extracted_issue_date": "06-03-2026",
+      "extracted_expiry_date": null,
+      "issuing_authority": null,
+      "declared_issue_date": null,
+      "declared_expiry_date": null,
+      "field_evidence": {
+        "certificate_number": [],
+        "extracted_issue_date": [
+          {
+            "page": 1,
+            "mode": "pixel_ocr",
+            "value": "06-03-2026"
+          }
+        ],
+        "extracted_expiry_date": [],
+        "issuing_authority": []
+      }
+    }
+  }
+]

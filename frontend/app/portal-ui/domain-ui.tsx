@@ -82,7 +82,7 @@ export function ActionForm({ kind, id, version, title, children, build, after, d
             values[key] = key.endsWith("Ids") ? entries.map(String) : entries.length > 1 ? entries : entries[0];
         }
         const command: Command = { kind, id, expectedVersion: observedVersion.current, values: { ...values, ...(build ? await build(fd) : {}) } };
-        const result = execute(command);
+        const result = await execute(command);
         dirty.current = false;
         const updated = result.data.applications.find(a => a.id === id) ?? result.data.visits.find(v => v.id === id);
         observedVersion.current = updated?.version ?? result.data.meetingRecords.find(r => r.id === id)?.currentVersion ?? observedVersion.current;

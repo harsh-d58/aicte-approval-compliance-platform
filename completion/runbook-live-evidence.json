@@ -1,0 +1,22 @@
+{
+  "started_at": "2026-10-29T16:10:29.512632+00:00",
+  "steps": [
+    {
+      "step": "00 persona sessions",
+      "personas": [
+        "institution",
+        "regional",
+        "scrutiny"
+      ]
+    },
+    {
+      "step": "01 persisted draft",
+      "application_id": "2cb80cdc-1a4e-48ef-b2ce-52f1563fa51b"
+    },
+    {
+      "step": "02 submission",
+      "status": "submitted"
+    }
+  ],
+  "application_id": "2cb80cdc-1a4e-48ef-b2ce-52f1563fa51b"
+}

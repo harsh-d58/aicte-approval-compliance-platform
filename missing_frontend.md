@@ -50,7 +50,7 @@ These fixes do not close the broader report semantics or configurable verificati
 
 ## 4. Service, data and policy dependencies — not missing page routes
 
-- **Identity/API security:** approved SSO/Keycloak, server-side permissions, independent file access, transaction/idempotency/concurrency enforcement, rate limits and signed downloads (§§3,9,10,13).
+- **Identity/API security:** the user-selected Supabase Auth prototype integration, approved future SSO, server-side permissions, independent file access, transaction/idempotency/concurrency enforcement, rate limits and signed downloads (§§3,9,10,13). The live read-only shell is built, but account/grant verification remains open.
 - **Files/OCR:** protected durable storage, hashing/scanning, real OCR provenance, approved issuer verification, retention and authorised transcript handling (§§5.4,13,15,16).
 - **Workers/providers:** transactional outbox, deadline/expiry scanners, delivery/calendar adapters, real provider references/receipts, durable jobs and scheduled exports (§§8,10,16).
 - **Audit/infrastructure:** protected append-only history, authoritative canonical hashes, optional anchoring, monitoring, approved hosting, backup/restore and security/load validation (§§13–15).

@@ -1,6 +1,6 @@
 # Existing PostgreSQL mapping — 28 October 2026
 
-The read-only diagnostic connected to the configured PostgreSQL 17 server over TLS and confirmed `transaction_read_only=on`. All **65 logical entity names** in PRD §5.2–5.7 exist as tables in the `public` schema. The database has 66 public tables in total; other schemas include provider-owned tables such as `auth.users`. The application backend uses `public.users`, never `auth.users`.
+The read-only diagnostic connected to the configured PostgreSQL 17 server over TLS and confirmed `transaction_read_only=on`. All **65 logical entity names** in PRD §5.2–5.7 exist as tables in the `public` schema. The initial audit found 66 public tables; the two additive Phase 2 infrastructure tables raised that count to 68. Other schemas include provider-owned tables such as `auth.users`. The application backend uses `public.users`, never `auth.users`.
 
 | PRD section | Existing public tables | Mapping status |
 | --- | --- | --- |
@@ -13,6 +13,24 @@ The read-only diagnostic connected to the configured PostgreSQL 17 server over T
 
 For the implemented identity slice, `public.users.identity_subject` is text and nullable; `public.users.id`, role IDs and scope IDs are UUIDs. Roles, permissions and scoped assignments are separate tables. The `/api/v1/me` queries accept only a verified token subject, require an active application user, and return only active assignments within their validity window. The `/api/v1/me/permissions` query derives permissions through `role_permissions` and carries each assignment's scope. The SQL was checked against the connected schema using a nonexistent test identity.
 
-The following first-stage tables currently have **zero rows**: `regions`, `institutions`, `institution_campuses`, `users`, `roles`, `permissions`, `role_permissions`, `user_role_assignments`, `application_types`, `applications`, `workflow_definitions`, and `document_types`. `auth.users` also has zero rows. No official roles, rules, users or institution records were invented or inserted. The Supabase project URL is configured locally and its ES256 JWKS is reachable, but there is no real account or policy assignment to exercise yet.
+Further constraint inspection confirmed `public.users.id` references `auth.users.id` with delete restricted, `identity_subject` is unique, and `users.status` permits lowercase `invited`, `active`, `suspended`, `disabled`. The identity query now requires both `id` and `identity_subject` to equal the verified Auth subject. Assignment status permits lowercase `active`, `revoked`, `expired`, `pending`; scope permits lowercase `global`, `institution`, `region`, `application`, `campus`. A `global` scope requires a null ID; every other scope requires a UUID. The read SQL and tests now use these exact stored values. `campus` is not supported by the first institution/application read routes, and no `evc` scope type exists. This does not establish a complete access policy; see [access_policy_decisions.md](access_policy_decisions.md).
+
+Row-level security is enabled on the inspected identity, institution, application and audit tables, but it is not forced. A live read-only check found the configured API connection role has `BYPASSRLS` (and is not a superuser). The current API therefore enforces scope in its own SQL and cannot rely on RLS for isolation. Before write routes or wider data reads go live, replace the bypass-capable connection with a least-privilege application role and verify its policies and grants.
+
+A 29 October [runtime-role inventory](../inspect_runtime_role.py) found **zero RLS policies** on `users`, `roles`, `permissions`, `role_permissions`, `user_role_assignments`, `institutions`, `applications`, `audit_events`, `outbox_events` and `api_idempotency_records`. Merely switching to a non-bypass role would deny the existing reads. Design and test exact policies and grants before changing the API connection; Phase 2 smoke checks continue to use the migration credential in transactions that roll back.
+
+At the initial 28 October audit, the first-stage tables had zero rows. On 29 October, the user requested a [synthetic dataset](mock_dataset.md), which added clearly labelled DEMO regions, institutions, categories, draft rule/workflow records, applications and documents. After the project owner approved the narrow [test policy](prototype_access_proposal.md), one confirmed Supabase test account was mapped to `public.users` and granted institution-scoped read permissions for DEMO records. No official rules, grants or institution identities were asserted. Browser sign-in reached the three live read routes with 200 responses; negative real-token and revocation checks remain.
 
 The full local metadata report is `backend/docs/database_audit.json`. It is ignored by Git and should be regenerated after schema changes. This mapping verifies presence and selected identity columns; it does not assert that every foreign key, uniqueness rule, policy guard, or immutable-record protection is sufficient.
+
+## Read-only recheck — 28 October 2026
+
+The diagnostic connected to PostgreSQL 17.11 over TLS with `transaction_read_only=on`; all 65 PRD entity names still match public tables. The one additional public table is `file_attachment_links`. Aggregate counts for `auth.users`, `public.users`, `roles`, `permissions`, `role_permissions`, `user_role_assignments`, `institutions` and `applications` are all zero. `/ready` returned 200 while an unauthenticated `/api/v1/me` returned 401. No schema or data was changed.
+
+Before implementing PRD §§7–10 writes, resolve these observed mapping gaps:
+
+- At the initial 28 October inventory, none of the 66 public tables was an outbox table. The 29 October additive migration installed `outbox_events` and `api_idempotency_records`; business mutations still need to write and consume them atomically.
+- `applications` and `documents` have `version` columns; `evc_visits` and several historical entities do not. Choose row locks or appropriate version tokens per mutation, then test PRD §10 concurrency cases.
+- `user_role_assignments` has no unique constraint or unique index that prevents duplicate/overlapping grants beyond its primary key. Enforce the approved duplicate/overlap rule in the assignment contract.
+- `audit_events` now has installed UPDATE/DELETE/TRUNCATE prevention triggers; a rolled-back smoke event proved UPDATE/DELETE rejection. Runtime grants, canonical hashes, verification and backup protection still need review before claiming full PRD §13.4 compliance.
+- The EVC table group has `expert_availability`, but no named institution-availability table. Map PRD §7.3 institution availability to a durable, versioned source before slot confirmation.

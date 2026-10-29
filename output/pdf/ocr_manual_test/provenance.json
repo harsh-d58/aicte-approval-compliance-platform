@@ -1,0 +1,28 @@
+{
+  "retrieved_on": "2026-10-29",
+  "source_page": "https://dfs.delhi.gov.in/node/15964",
+  "source_pdf": "https://dfs.delhi.gov.in/sites/default/files/circulars-orders/52026021801098_firesafetycertificate.pdf",
+  "source_unchanged": true,
+  "render_dpi": 220,
+  "pdf_pages": 1,
+  "original_has_text_layer": true,
+  "image_only_pdf_has_text_layer": false,
+  "png_has_embedded_answers": false,
+  "files": [
+    {
+      "name": "official_delhi_fire_safety_certificate.pdf",
+      "bytes": 80641,
+      "sha256": "6500b999d34d50aef1da3e7f1be5ec3e9c6acd94e28078416392b9fae4d2496c"
+    },
+    {
+      "name": "official_certificate_page_1.png",
+      "bytes": 1098488,
+      "sha256": "0462a7da64d5ed37976492fbb4ac2a670ef9663c110a30527eb5ed2c47000124"
+    },
+    {
+      "name": "official_certificate_image_only.pdf",
+      "bytes": 1378522,
+      "sha256": "6edc113a6c0a27bf76bfb6528ed0816f170d1b96f5d732ee1656d4fb3e8e8766"
+    }
+  ]
+}
