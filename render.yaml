@@ -10,14 +10,14 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: APP_ENV
-        value: development
+        value: production
       - key: API_PREFIX
         value: /api/v1
+      - key: FRONTEND_ORIGIN
+        value: https://aicte-approval-compliance-platform-ruddy.vercel.app
       - key: DATABASE_RUNTIME_URL
         sync: false
       - key: DATABASE_WRITE_URL
         sync: false
       - key: SUPABASE_URL
-        sync: false
-      - key: FRONTEND_ORIGIN
         sync: false

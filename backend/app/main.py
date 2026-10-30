@@ -60,8 +60,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         dependencies=[Depends(authorize_request)],
     )
     app.state.settings = config
-    allowed_origins = [config.frontend_origin] if config.frontend_origin else []
-    if config.app_env == "development":
+    if config.frontend_origin:
+        allowed_origins = [x.strip() for x in config.frontend_origin.split(",") if x.strip()]
+    else:
+        allowed_origins = ["*"]
+    if config.app_env == "development" and "*" not in allowed_origins:
         allowed_origins.extend(["http://localhost:3000", "http://127.0.0.1:3000"])
     app.add_middleware(
         CORSMiddleware,
