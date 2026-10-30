@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import ts from "typescript";
 import { createElement } from "react";
+import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as jsxRuntime from "react/jsx-runtime";
 const testDirectory = dirname(fileURLToPath(import.meta.url));
@@ -21,6 +22,164 @@ function load(file, imports = {}) {
 const { mockData } = load("lib/portal/mock-data.ts");
 const { scopedSnapshot, safeReturnTo, activeApplication } = load("lib/portal/view-models.ts");
 const user = id => mockData.users.find(u => u.id === id);
+const { compatibleEvidence, deficiencyResponses } = load("lib/live/deficiency-evidence.ts");
+const { executeLiveCommand } = load("lib/live/commands.ts", {"./deficiency-evidence":{deficiencyResponses}});
+const { confirmableVisitSlots } = load("lib/live/visit-slots.ts");
+const { workspaceAssignmentIndex } = load("lib/live/workspace-scope.ts");
+const { recordApprovalBlock } = load("lib/live/record-approval.ts");
+const { decisionState } = load("lib/live/decision-state.ts");
+
+test("live decisions preserve approve, reject and close as different server outcomes", async () => {
+  const bodies=[];
+  for (const outcome of ["APPROVE","REJECT","CLOSE"]) {
+    await executeLiveCommand({kind:"decision.record",id:"case",values:{outcome,reason:"Recorded determination"}},{applications:[{id:"case",version:2}]},{post:async(path,body)=>{bodies.push(body);return {};}});
+  }
+  assert.deepEqual(bodies.map(body=>[body.decision_type,body.decision_status]),[["approve","approved"],["reject","rejected"],["close","approved"]]);
+});
+
+test("approval condition saves the entered evidence checklist and evidence sends exact versions", async () => {
+  const requests=[];
+  const client={post:async(path,body)=>{requests.push({path,body});return {id:"condition"};}};
+  const data={applications:[{id:"case",institutionId:"institution"}],decisions:[]};
+  await executeLiveCommand({kind:"condition.create",id:"case",values:{description:"Seismic attestation",requirements:" PWD Structural Safety Attestation \nGeotagged Photographs\n",dueAt:"2026-12-30T12:00"}},data,client);
+  assert.deepEqual(requests[0].body.evidence_requirements,["PWD Structural Safety Attestation","Geotagged Photographs"]);
+  await executeLiveCommand({kind:"evidence.submit",id:"condition",values:{documentVersionIds:["exact-version"]}},data,client);
+  assert.deepEqual(requests[1].body.document_version_ids,["exact-version"]);
+});
+
+test("decision workspace blocks pending EVC and case closure with open conditions", () => {
+  const data={conditions:[],deficiencies:[],workflows:[{id:"workflow",stages:[{code:"CUSTOM_INSPECTION",type:"evc"}]}],visits:[],meetingRecords:[]};
+  const application={id:"case",workflowId:"workflow",stageType:"decision",currentStage:"FINAL_REVIEW",status:"DECISION_PENDING"};
+  assert.match(decisionState(data,application).blocker,/Complete the EVC visit/);
+  data.visits=[{id:"visit",applicationId:"case",status:"COMPLETED"}];
+  data.meetingRecords=[{visitId:"visit",type:"EVC_REPORT",currentVersion:2,versions:[{number:2,status:"APPROVED"}]}];
+  assert.deepEqual(decisionState(data,application).outcomes,["APPROVE","REJECT"]);
+  data.conditions=[{applicationId:"case",status:"OPEN"}];
+  assert.match(decisionState(data,{...application,status:"APPROVED"}).blocker,/Close every verified approval condition/);
+  data.conditions[0].status="CLOSED";
+  assert.deepEqual(decisionState(data,{...application,status:"APPROVED"}).outcomes,["CLOSE"]);
+});
+
+test("decision page displays a saved condition with evidence requirements and its live link", () => {
+  const data={applications:[{id:"case",number:"CASE-001",workflowId:"workflow",stageType:"decision",currentStage:"DECISION",status:"DECISION_PENDING",version:1}],
+    conditions:[{id:"condition",code:"COND-001",applicationId:"case",description:"Seismic condition",evidenceRequired:["Attestation","Photographs"],dueAt:"2026-12-30",status:"OPEN",sourceDecisionId:"",version:1}],
+    deficiencies:[],workflows:[{id:"workflow",stages:[{code:"EVC",type:"evc"}]}],visits:[],meetingRecords:[],decisions:[],users:[]};
+  const {default:Workspace}=load("app/portal-ui/DecisionAndClosure.tsx",{
+    "react/jsx-runtime":jsxRuntime,"@/lib/live/decision-state":{decisionState},
+    "./domain-ui":{useWorkspace:()=>({data,allowed:(...roles)=>roles.includes("REGIONAL")}),
+      Panel:({title,children})=>createElement("section",null,title,children),
+      Table:({rows})=>createElement("div",null,...rows.flat()),
+      Field:()=>null,ActionForm:({children})=>createElement("form",null,children),ReasonAction:()=>null,
+      Link:({children,...props})=>createElement("a",props,children),Badge:({status})=>createElement("span",null,status),s:{},formatDateTime:value=>value}
+  });
+  const html=renderToStaticMarkup(createElement(Workspace,{applicationId:"case"}));
+  assert.match(html,/Seismic condition/);assert.match(html,/Attestation; Photographs/);
+  assert.match(html,/href="\/portal\/compliance\/condition"/);
+  assert.match(html,/Complete the EVC visit and approve its report/);
+});
+
+test("EVC approval explains the missing completed visit while minutes stay independent", () => {
+  assert.match(recordApprovalBlock({type:"EVC_REPORT",visitId:"visit"},[{id:"visit",status:"CONFIRMED"}]),/Complete the EVC visit/);
+  assert.equal(recordApprovalBlock({type:"EVC_REPORT",visitId:"visit"},[{id:"visit",status:"COMPLETED"}]),"");
+  assert.equal(recordApprovalBlock({type:"MINUTES",visitId:"visit"},[{id:"visit",status:"CONFIRMED"}]),"");
+});
+
+test("expert login selects a real committee scope instead of an unused first assignment", () => {
+  const expert={id:"aditi",assignments:[{role:"EVC_EXPERT",scope:{type:"APPLICATION",id:"unused"}},{role:"EVC_EXPERT",scope:{type:"APPLICATION",id:"assigned"}}]};
+  const data={experts:[{id:"profile",userId:"aditi"}],visits:[{id:"visit",applicationId:"assigned",committee:[{expertId:"profile"}]}]};
+  assert.equal(workspaceAssignmentIndex(data,expert,0),1);
+  assert.equal(workspaceAssignmentIndex(data,expert,1),1);
+  assert.equal(workspaceAssignmentIndex({...data,visits:[]},expert,0),0);
+});
+
+test("expert scope selection never grants an unassigned visit or changes another role", () => {
+  const data={experts:[{id:"someone-else",userId:"other"}],visits:[{id:"visit",applicationId:"assigned",committee:[{expertId:"someone-else"}]}]};
+  assert.equal(workspaceAssignmentIndex(data,{id:"aditi",assignments:[{role:"EVC_EXPERT",scope:{type:"APPLICATION",id:"unused"}},{role:"EVC_EXPERT",scope:{type:"APPLICATION",id:"assigned"}}]},0),0);
+  assert.equal(workspaceAssignmentIndex(data,{id:"regional",assignments:[{role:"REGIONAL",scope:{type:"REGION",id:"north"}}]},0),0);
+});
+
+test("confirmed visits cannot expose another confirmation action", async () => {
+  const visit={id:"visit",status:"CONFIRMED"};
+  const slots=[{id:"slot",visitId:"visit",feasible:true,expiresAt:"2099-01-01",startAt:"2098-01-01",endAt:"2098-01-02",rank:1}];
+  assert.deepEqual(confirmableVisitSlots(visit,slots),[]);
+  let requests=0;
+  await assert.rejects(executeLiveCommand({kind:"visit.confirm",id:"visit",values:{slotId:"slot"}},{applications:[],visits:[visit],slots},{post:async()=>{requests++;return {};}}),/already confirmed/);
+  assert.equal(requests,0);
+});
+
+test("slot picker excludes expired proposals and keeps the newest duplicate interval", () => {
+  const common={visitId:"visit",feasible:true,startAt:"2026-11-05T09:00:00Z",endAt:"2026-11-05T17:00:00Z",rank:1};
+  const slots=[{...common,id:"expired",expiresAt:"2026-10-29T18:52:00Z"},{...common,id:"current",expiresAt:"2026-10-30T18:52:00Z"},{...common,id:"newer",expiresAt:"2026-10-30T20:00:00Z"}];
+  assert.deepEqual(confirmableVisitSlots({id:"visit",status:"PROPOSED"},slots,Date.parse("2026-10-29T22:00:00Z")).map(slot=>slot.id),["newer"]);
+});
+
+test("correction upload stays on the notice and exposes a local file chooser", () => {
+  const data={applications:[{id:"case",institutionId:"institution"}],deficiencies:[{id:"notice",applicationId:"case",items:[{id:"item",status:"OPEN",documentId:"fire",criterion:"FIRE"}]}],documents:[{id:"fire",institutionId:"institution",type:"FIRE",versions:[]}],configurations:[]};
+  const {default:Picker}=load("app/portal-ui/CorrectionEvidencePicker.tsx",{
+    react:React,"react/jsx-runtime":jsxRuntime,
+    "@/lib/live/deficiency-evidence":{compatibleEvidence},
+    "@/lib/portal/files":{putFile:async()=>{}},
+    "./domain-ui":{useWorkspace:()=>({data,execute:async()=>{throw new Error("Unexpected submit")}}),humanize:value=>value,s:{}}
+  });
+  const html=renderToStaticMarkup(createElement(Picker,{applicationId:"case",noticeId:"notice",itemId:"item"}));
+  assert.match(html,/type="file"/);
+  assert.match(html,/<button type="button"[^>]*>Upload correction evidence<\/button>/);
+  assert(!html.includes('href='));
+  assert.match(html,/name="evidence-item"/);
+});
+
+test("live response command sends the selected version to the real API contract", async () => {
+  const data={applications:[{id:"case",institutionId:"institution"}],deficiencies:[{id:"notice",applicationId:"case",items:[{id:"item",status:"OPEN",documentId:"fire"}]}],documents:[{id:"fire",institutionId:"institution",type:"FIRE",versions:[{id:"v2",verification:"PENDING"}]}]};
+  let posted;
+  await executeLiveCommand({kind:"deficiency.respond",id:"notice",values:{documentVersionIds:["v2"],response:"Renewed evidence supplied"}},data,{post:async(path,body)=>{posted={path,body};return {};}});
+  assert.equal(posted.path,"/deficiency-notices/notice/responses");
+  assert.equal(posted.body.item_responses[0].document_version_id,"v2");
+  assert.equal(posted.body.item_responses[0].related_document_id,"fire");
+});
+
+test("scrutiny cannot accept an open item before institutional submission", async () => {
+  let requests=0;
+  const data={applications:[],deficiencies:[{id:"notice",items:[{id:"item",status:"OPEN"}]}]};
+  await assert.rejects(executeLiveCommand({kind:"deficiency.resolve",id:"notice",values:{itemId:"item",resolution:"ACCEPTED"}},data,{post:async()=>{requests++;return {};}}),/must submit/);
+  assert.equal(requests,0);
+});
+
+test("batch determination reviews submitted responses and skips untouched items", async () => {
+  const paths=[];
+  const keys=[];
+  const data={applications:[],deficiencies:[{id:"notice",items:[{id:"open",status:"OPEN"},{id:"ready",status:"RESPONDED"},{id:"ready-two",status:"RESPONDED"},{id:"done",status:"RESOLVED"}]}]};
+  await executeLiveCommand({kind:"deficiency.resolve",id:"notice",values:{reason:"Reviewed submitted correction"}},data,{post:async(path,body,headers)=>{paths.push(path);keys.push(headers['Idempotency-Key']);return {};}});
+  assert.deepEqual(paths,["/deficiency-items/ready/resolve","/deficiency-items/ready-two/resolve"]);
+  assert.notEqual(keys[0],keys[1]);
+});
+
+test("live deficiency response submits the checked exact version and document ID", () => {
+  const data = { applications:[{id:"case",institutionId:"institution"}], deficiencies:[{id:"notice",applicationId:"case",items:[{id:"item",documentId:"fire",status:"OPEN",criterion:"FIRE"}]}], documents:[
+    {id:"fire",institutionId:"institution",applicationId:null,type:"FIRE",versions:[{id:"fire-v2",verification:"PENDING"}]}
+  ]};
+  const result = deficiencyResponses(data,"notice",{documentVersionIds:["fire-v2"],response:"Renewed certificate attached"});
+  assert.deepEqual(result,[{item_id:"item",related_document_id:"fire",document_version_id:"fire-v2",narrative:"Renewed certificate attached"}]);
+});
+
+test("correction picker excludes sibling cases and wrong mandated document types", () => {
+  const data = {applications:[{id:"case",institutionId:"institution"}],documents:[
+    {id:"fire",institutionId:"institution",applicationId:null,type:"FIRE",versions:[{id:"valid",verification:"PENDING"}]},
+    {id:"sibling",institutionId:"institution",applicationId:"other-case",type:"FIRE",versions:[{id:"wrong-case",verification:"VERIFIED"}]},
+    {id:"land",institutionId:"institution",applicationId:"case",type:"LAND",versions:[{id:"wrong-type",verification:"VERIFIED"}]}
+  ]};
+  assert.deepEqual(compatibleEvidence(data,data.applications[0],{documentId:"fire"}).map(row=>row.version.id),["valid"]);
+});
+
+test("itemized correction preserves different versions per item and skips resolved items", () => {
+  const data={applications:[{id:"case",institutionId:"institution"}], deficiencies:[{id:"notice",applicationId:"case",items:[
+    {id:"one",documentId:"fire",status:"OPEN"},{id:"two",documentId:"land",status:"OPEN"},{id:"done",status:"RESOLVED"}]}],documents:[
+    {id:"fire",institutionId:"institution",type:"FIRE",versions:[{id:"fv2",verification:"PENDING"}]},
+    {id:"land",institutionId:"institution",type:"LAND",versions:[{id:"lv3",verification:"PENDING"}]}
+  ]};
+  const result=deficiencyResponses(data,"notice",{response:"Corrections supplied",itemResponses:[{itemId:"one",versionId:"fv2"},{itemId:"two",versionId:"lv3"}]});
+  assert.deepEqual(result.map(row=>row.document_version_id),["fv2","lv3"]);
+  assert.throws(()=>deficiencyResponses(data,"notice",{response:"Text alone is not an uploaded file"}),/compatible evidence version/);
+});
 
 test("institution dashboard and application register share only the assigned institution", () => {
   const data = scopedSnapshot(mockData, user("user-institution"), 0);

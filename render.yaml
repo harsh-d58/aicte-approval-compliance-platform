@@ -2,6 +2,7 @@ services:
   - type: web
     name: aicte-backend
     runtime: python
+    plan: free
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
@@ -20,4 +21,3 @@ services:
         sync: false
       - key: FRONTEND_ORIGIN
         sync: false
-

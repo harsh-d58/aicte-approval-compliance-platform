@@ -121,8 +121,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         }
         if error.status_code in standard:
             code, message = standard[error.status_code]
+            if error.status_code == 409 and error.detail in (
+                'Complete the EVC visit before approving its report',
+                'Resolve all deficiency items before approving the EVC report',
+                'Submit the current draft for review before approval',
+                'Record source content changed; generate a new version',
+                'Only an approved application can be closed',
+                'Close every verified approval condition before closing the application',
+                'This application already has a final decision',
+                'Complete the configured review route before recording a decision',
+                'Resolve every deficiency item before recording a decision',
+                'Complete the EVC visit and approve its report before recording a decision',
+                'Reopen the application before reopening this condition',
+                'Only a condition with accepted evidence can be closed',
+            ):
+                message = error.detail
             return _error(request, error.status_code, code, message)
-        return _error(request, error.status_code, "HTTP_ERROR", "Request could not be completed.")
+        return _error(request, error.status_code, "HTTP_ERROR", str(error.detail) if getattr(error, "detail", None) else "Request could not be completed.")
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request: Request, error: RequestValidationError):

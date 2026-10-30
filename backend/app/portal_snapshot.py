@@ -85,7 +85,6 @@ def clean_text(val):
     v = v.replace("DEMO-LIVE-", "AICTE-2026-").replace("DEMO-APP-", "AICTE-APP-")
     v = v.replace("DEMO-COND-", "COND-2026-").replace("DEMO-DEF-", "DEF-2026-").replace("DEMO-INST-", "INST-")
     v = re.sub(r"^DEMO[\s_-]+", "", v, flags=re.IGNORECASE)
-    v = re.sub(r"[\s_-]00\d$", "", v)
     v = re.sub(r"\bDEMO\b", "", v, flags=re.IGNORECASE).strip()
     return v
 
@@ -201,12 +200,16 @@ def map_snapshot(tables, subject):
     result["deficiencies"] = [{"id": n["id"], "number": clean_text(str(n["notice_number"])), "applicationId": n["application_id"], "issuedBy": n.get("issued_by") or "", "issuedAt": n["issued_at"], "responseDueAt": n.get("response_due_at") or "", "reason": n.get("reason") or "Deficiency notice", "status": item_status(n["status"]), "items": [{"id": i["id"], "criterion": i.get("criterion_code") or "", "description": i["description"], "documentId": i.get("related_document_id"), "status": item_status(i["resolution_status"]), "response": i.get("response_text"), "responseVersionId": i.get("response_document_version_id")} for i in items[n["id"]]]} for n in t("deficiency_notices") if n["application_id"] in app_ids]
     for application in result["applications"]:
         application["applicationTypeId"] = apps[application["id"]]["application_type_id"]
+        stage_instance = stage_instances.get(apps[application["id"]].get("current_stage_instance_id"), {})
+        application["stageType"] = stages.get(stage_instance.get("workflow_stage_id"), {}).get("stage_type", "")
     for workflow in result["workflows"]:
         persisted_workflow = next(w for w in t("workflow_definitions") if w["id"] == workflow["id"])
+        workflow["applicationTypeId"] = persisted_workflow.get("application_type_id")
         workflow["effectiveFrom"] = persisted_workflow.get("effective_from") or workflow["effectiveFrom"]
         for stage in workflow["stages"]:
             stage["id"] = next((s["id"] for s in workflow_stages[workflow["id"]] if s["stage_code"].removeprefix("DEMO-") == stage["code"]), "")
             persisted_stage = stages.get(stage["id"], {})
+            stage["type"] = persisted_stage.get("stage_type")
             stage["ownerRole"] = role(persisted_stage.get("owner_role_code")) or stage["ownerRole"]
     _documents(result, tables, institution_ids, app_ids)
     _visits(result, tables, app_ids)
@@ -338,7 +341,7 @@ def _visits(result, tables, app_ids):
     result["availability"] = [{"id": a["id"], "participantType": "EXPERT", "participantId": expert_by_user.get(a["expert_user_id"], a["expert_user_id"]), "startAt": a["start_at"], "endAt": a["end_at"], "state": "AVAILABLE" if a["availability_status"] == "available" else "BUSY", "source": "CALENDAR" if a.get("source") == "calendar" else "MANUAL", "confirmedAt": a.get("last_confirmed_at") or a.get("created_at") or ""} for a in t("expert_availability")]
     visible_institutions = {i["id"] for i in result["institutions"]}
     result["availability"].extend({"id": a["id"], "participantType": "INSTITUTION", "participantId": a["institution_id"], "startAt": a["start_at"], "endAt": a["end_at"], "state": "AVAILABLE" if a["availability_status"] == "available" else "BUSY", "source": "MANUAL", "confirmedAt": a.get("last_confirmed_at") or a.get("created_at") or ""} for a in t("institution_availability") if a["institution_id"] in visible_institutions)
-    result["visits"] = [{"id": v["id"], "applicationId": v["application_id"], "campusId": v.get("campus_id") or "", "status": VISIT_STATUSES.get(upper(v["status"]), upper(v["status"])), "requiredBy": v.get("required_by") or "", "durationMinutes": v.get("duration_minutes") or 480, "requiredMemberCount": v.get("required_member_count") or 5, "coordinatorId": v.get("coordinator_user_id") or "", "committee": [{"expertId": expert_by_user.get(m["expert_user_id"], m["expert_user_id"]), "role": upper(m["committee_role"]), "selectedBy": m.get("selected_by") or "", "selectedAt": m["selected_at"]} for m in members[v["id"]] if m["selection_status"] == "selected"], "confirmedSlotId": next((s["id"] for s in slots[v["id"]] if s["start_at"] == v.get("confirmed_start_at") and s["end_at"] == v.get("confirmed_end_at")), None), "version": v.get("version") or 1, "events": [{"at": e["event_at"], "type": e["event_type"], "actorId": e.get("actor_user_id") or "", "reason": e.get("reason") or ""} for e in events[v["id"]]]} for v in visits]
+    result["visits"] = [{"id": v["id"], "applicationId": v["application_id"], "campusId": v.get("campus_id") or "", "status": "PROPOSED" if upper(v["status"]) == "SCHEDULING" and any(s.get("feasibility_status") == "feasible" for s in slots[v["id"]]) else VISIT_STATUSES.get(upper(v["status"]), upper(v["status"])), "requiredBy": v.get("required_by") or "", "durationMinutes": v.get("duration_minutes") or 480, "requiredMemberCount": v.get("required_member_count") or 5, "coordinatorId": v.get("coordinator_user_id") or "", "committee": [{"expertId": expert_by_user.get(m["expert_user_id"], m["expert_user_id"]), "role": upper(m["committee_role"]), "selectedBy": m.get("selected_by") or "", "selectedAt": m["selected_at"]} for m in members[v["id"]] if m["selection_status"] == "selected"], "confirmedSlotId": next((s["id"] for s in slots[v["id"]] if s["start_at"] == v.get("confirmed_start_at") and s["end_at"] == v.get("confirmed_end_at")), None), "version": v.get("version") or 1, "events": [{"at": e["event_at"], "type": e["event_type"], "actorId": e.get("actor_user_id") or "", "reason": e.get("reason") or ""} for e in events[v["id"]]]} for v in visits]
     result["slots"] = [{"id": s["id"], "visitId": s["evc_visit_id"], "startAt": s["start_at"], "endAt": s["end_at"], "rank": s["rank"], "feasible": s["feasibility_status"] == "feasible", "explanation": [s.get("explanation") or ""], "participantIds": [expert_by_user.get(m["expert_user_id"], m["expert_user_id"]) for m in members[s["evc_visit_id"]] if m["selection_status"] == "selected"], "snapshotAt": s.get("availability_snapshot_at") or s.get("created_at") or "", "expiresAt": s.get("expires_at") or "", "blockers": [] if s["feasibility_status"] == "feasible" else [s.get("explanation") or "Availability unresolved"]} for s in t("slot_recommendations") if s["evc_visit_id"] in visit_ids]
     result["invitations"] = [{"id": i["id"], "visitId": i["evc_visit_id"], "recipientId": i["recipient_user_id"], "response": upper(i["response_status"]), "delivery": upper(i["delivery_status"]), "calendarStatus": upper(i.get("calendar_status"), "PENDING")} for i in t("evc_invitations") if i["evc_visit_id"] in visit_ids]
     result["observations"] = [{"id": o["id"], "visitId": o["evc_visit_id"], "criterion": o.get("criterion_code") or "", "text": o["observation_text"], "authorId": o.get("created_by") or "", "sourceType": "COMMITTEE_NOTE" if o.get("source_type") == "committee_note" else "STRUCTURED_FORM", "status": "DRAFT" if o.get("review_status") == "draft" else "SUBMITTED"} for o in t("evc_observations") if o["evc_visit_id"] in visit_ids]
@@ -371,10 +374,20 @@ def _visits(result, tables, app_ids):
 
 def _compliance(result, tables, app_ids):
     t = lambda name: tables.get(name, [])
-    result["decisions"] = [{"id": d["id"], "applicationId": d["application_id"], "type": {"APPROVED": "APPROVE", "REJECTED": "REJECT", "CLOSED": "CLOSE"}.get(upper(d["decision_type"]), upper(d["decision_type"])), "status": "APPROVED" if d["decision_status"] in ("approved", "final", "issued") else "DRAFT", "authorityId": d.get("created_by") or d.get("decision_authority") or "", "reason": d.get("reason") or "", "at": d.get("decision_at")} for d in t("approval_decisions") if d["application_id"] in app_ids]
+    result["decisions"] = [{"id": d["id"], "applicationId": d["application_id"], "type": {"APPROVAL": "APPROVE", "APPROVED": "APPROVE", "REJECTION": "REJECT", "REJECTED": "REJECT", "CLOSURE": "CLOSE", "CLOSED": "CLOSE"}.get(upper(d["decision_type"]), upper(d["decision_type"])), "status": "APPROVED" if d["decision_status"] in ("approved", "rejected", "withdrawn", "final", "issued") else "DRAFT", "authorityId": d.get("created_by") or d.get("decision_authority") or "", "reason": d.get("reason") or "", "at": d.get("decision_at")} for d in t("approval_decisions") if d["application_id"] in app_ids]
     conditions = [c for c in t("compliance_conditions") if c["application_id"] in app_ids]
     condition_ids = {c["id"] for c in conditions}
-    result["conditions"] = [{"id": c["id"], "applicationId": c["application_id"], "institutionId": c["institution_id"], "sourceDecisionId": c.get("source_approval_id") or "", "code": clean_text(c["condition_code"]), "description": clean_text(c["description"]), "evidenceRequired": c.get("evidence_requirements") or ["Provide dated evidence for this condition"], "dueAt": c.get("due_at") or "", "status": {"UNDER_VERIFICATION":"UNDER_REVIEW", "REJECTED":"VERIFIED_NON_COMPLIANT", "OVERDUE": "OPEN", "COMPLIANT": "VERIFIED_COMPLIANT", "NON_COMPLIANT": "VERIFIED_NON_COMPLIANT", "FULFILLED": "VERIFIED_COMPLIANT"}.get(upper(c["status"]), upper(c["status"])), "reviewerId": c.get("reviewer_user_id") or "", "closureReason": c.get("closure_reason")} for c in conditions]
+    closure_reasons = {}
+    for event in sorted(t("audit_events"), key=lambda row: (row.get("event_at", ""), row["id"])):
+        if event.get("action") == "COMPLIANCE_CONDITION_CLOSED" and event.get("entity_id") in condition_ids:
+            closure_reasons[event["entity_id"]] = event.get("reason") or (event.get("metadata") or {}).get("reason")
+    submission_conditions = {row["id"]: row["compliance_condition_id"] for row in t("evidence_submissions")}
+    reviewers = {}
+    for verification in sorted(t("compliance_verifications"), key=lambda row: (row.get("verified_at", ""), row["id"])):
+        condition_id = submission_conditions.get(verification["evidence_submission_id"])
+        if condition_id in condition_ids:
+            reviewers[condition_id] = verification.get("reviewer_user_id")
+    result["conditions"] = [{"id": c["id"], "applicationId": c["application_id"], "institutionId": c["institution_id"], "version": c.get("version", 1), "sourceDecisionId": c.get("source_approval_id") or "", "code": clean_text(c["condition_code"]), "description": clean_text(c["description"]), "evidenceRequired": c.get("evidence_requirements") or [], "dueAt": c.get("due_at") or "", "status": {"UNDER_VERIFICATION":"UNDER_REVIEW", "REJECTED":"VERIFIED_NON_COMPLIANT", "OVERDUE": "OPEN", "COMPLIANT": "VERIFIED_COMPLIANT", "NON_COMPLIANT": "VERIFIED_NON_COMPLIANT", "FULFILLED": "VERIFIED_COMPLIANT"}.get(upper(c["status"]), upper(c["status"])), "reviewerId": reviewers.get(c["id"]) or c.get("reviewer_user_id") or "", "closureReason": closure_reasons.get(c["id"]) if c["status"] == "closed" else None} for c in conditions]
     files = grouped(t("evidence_submission_files"), "evidence_submission_id")
     evidences = [e for e in t("evidence_submissions") if e["compliance_condition_id"] in condition_ids]
     evidence_ids = {e["id"] for e in evidences}
@@ -397,7 +410,7 @@ def _shared(result, tables, subject, app_ids, institution_ids):
         columns = d.get("columns_config") or []
         filters = d.get("filters_config") or []
         policy = d.get("access_policy") or {}
-        result["reportDefinitions"].append({"id": report_code(d["report_code"]), "name": d["name"], "columns": columns if isinstance(columns, list) else columns.get("columns", []), "filters": filters if isinstance(filters, list) else filters.get("filters", []), "roles": [r for r in (role(r) for r in policy.get("roles", sorted(ROLES))) if r in ROLES]})
+        result["reportDefinitions"].append({"id": report_code(d["report_code"]), "name": clean_text(d["name"]), "columns": columns if isinstance(columns, list) else columns.get("columns", []), "filters": filters if isinstance(filters, list) else filters.get("filters", []), "roles": [r for r in (role(r) for r in policy.get("roles", sorted(ROLES))) if r in ROLES]})
     result["reportRuns"] = []
     for r in t("report_runs"):
         if r.get("requested_by") != subject:

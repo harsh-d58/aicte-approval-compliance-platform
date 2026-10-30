@@ -7,7 +7,7 @@ import { humanize } from "@/lib/portal/view-models";
 import s from "./portal.module.css";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
-  return <Link href="/" className={s.brand} aria-label="AICTE Portal home"><Image src="/aicte_logo.png" alt="" width={46} height={46} unoptimized className={s.brandLogo} /><span><strong>AICTE Portal</strong><small>{compact ? "Approval & compliance" : "Approval & Compliance Platform"}</small></span></Link>;
+  return <Link href="/" className={s.brand} aria-label="SETU Portal home"><Image src="/setu_logo.png" alt="SETU Logo" width={48} height={48} unoptimized className={s.brandLogo} /><span><strong>SETU Portal</strong><small>{compact ? "Approval & compliance" : "Approval & Compliance Platform"}</small></span></Link>;
 }
 export function Arrow({ back = false }: { back?: boolean }) { return <span aria-hidden="true">{back ? "←" : "→"}</span>; }
 export function tabKeys(event: React.KeyboardEvent<HTMLDivElement>) {

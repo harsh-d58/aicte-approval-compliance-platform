@@ -254,3 +254,11 @@ class DeficiencyRouteTests(TestCase):
                             for sql, params in statements))
         evidence_insert = next(params for sql, params in statements if "INSERT INTO public.deficiency_item_responses" in sql)
         self.assertEqual(evidence_insert[2], payload.item_responses[0].narrative)
+
+    def test_pending_item_cannot_be_accepted_without_submitted_response(self):
+        cursor=MockCursor(fetchone_val={"id":self.item_id,"deficiency_notice_id":self.notice_id,"resolution_status":"pending"})
+        with patch("backend.app.deficiencies._user",return_value=self.caller_row), patch("backend.app.deficiencies.write_transaction",return_value=nullcontext(MockConnection(cursor))), patch("backend.app.deficiencies.append_event") as audit:
+            with self.assertRaises(HTTPException) as raised:
+                resolve_deficiency_item(self.item_id,ResolveDeficiencyItemRequest(resolution_status="accepted",reason="Attempt premature acceptance"),self.request,str(self.caller_id))
+        self.assertEqual(raised.exception.status_code,409)
+        audit.assert_not_called()

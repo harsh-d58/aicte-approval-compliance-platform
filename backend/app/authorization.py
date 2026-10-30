@@ -74,7 +74,7 @@ def allowed_roles(path):
     if path.startswith(("/workflows", "/configurations", "/aph-rules")): return {"POLICY", "CENTRAL"}
     if "deficien" in path:
         return {"INSTITUTION"} if any(x in path for x in ("response", "resubmit")) else {"SCRUTINY", "REGIONAL"}
-    if any(x in path for x in ("decisions", "close", "statutory")): return {"REGIONAL", "CENTRAL"}
+    if path.startswith("/applications") and any(x in path for x in ("decisions", "close", "statutory")): return {"REGIONAL", "CENTRAL"}
     if path.startswith("/applications") and "evc-visits" in path: return {"REGIONAL", "EVC_COORDINATOR"}
     if path.startswith("/applications"):
         return {"REGIONAL", "CENTRAL"} if "assignments" in path else {"SCRUTINY", "REGIONAL", "CENTRAL"} if "transition" in path else {"INSTITUTION"}
@@ -149,8 +149,10 @@ def check_request(request, subject, body):
                 cur.execute(RESOURCES[table], (ident,)); row = cur.fetchone()
                 if row is None or not any(within(row,a) for a in assignments): raise HTTPException(404)
                 if row.get("application_id") and all(role_name(a["role_code"]) == "SCRUTINY" for a in assignments):
-                    cur.execute("SELECT 1 FROM assignments WHERE application_id=%s AND assigned_user_id=%s AND status='active'",(row["application_id"],subject))
-                    if not cur.fetchone(): raise HTTPException(404)
+                    cur.execute("SELECT assigned_user_id FROM assignments WHERE application_id=%s AND status IN ('active', 'assigned', 'pending')", (row["application_id"],))
+                    assigned = cur.fetchall()
+                    if assigned and not any(str(r["assigned_user_id"]) == str(subject) for r in assigned):
+                        raise HTTPException(404)
                 if all(a["role_code"].startswith("DEMO_") for a in assignments) and not (str(row["institution_code"]).startswith("DEMO-") or str(row["institution_code"]).startswith("INST-")):
                     cur.execute("SELECT 1 FROM user_role_assignments a JOIN roles r ON r.id=a.role_id WHERE a.user_id=%s AND r.role_code LIKE 'DEMO_%%'",(row["created_by"],))
                     if not cur.fetchone(): raise HTTPException(404)

@@ -6,8 +6,9 @@ from typing import Annotated, Any
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from .accounts import _read_connection, _serialize, _user
 from .audit import append_event
@@ -38,11 +39,40 @@ class CreateConditionRequest(BaseModel):
     description: str = Field(..., min_length=3, max_length=2000)
     due_at: datetime | None = None
     verification_role_id: UUID | None = None
+    evidence_requirements: list[str] = Field(default_factory=list, max_length=50)
+
+    @field_validator("evidence_requirements")
+    @classmethod
+    def meaningful_requirements(cls, values):
+        result = [value.strip() for value in values]
+        if any(not value or len(value) > 500 for value in result):
+            raise ValueError("Each evidence requirement must contain 1–500 characters")
+        if len(set(result)) != len(result):
+            raise ValueError("Evidence requirements must not be duplicated")
+        return result
+
+    @field_validator("due_at")
+    @classmethod
+    def timezone_required(cls, value):
+        if value is not None and (value.tzinfo is None or value.utcoffset() is None):
+            raise ValueError("Condition due date must include a timezone")
+        return value
 
 
 class SubmitEvidenceRequest(BaseModel):
     document_version_ids: list[UUID] = Field(..., min_length=1)
     remarks: str | None = Field(None, max_length=1000)
+
+
+class UpdateConditionRequest(BaseModel):
+    evidence_requirements: list[str] = Field(..., max_length=50)
+    expected_version: int = Field(..., ge=1)
+    reason: str = Field(..., min_length=3, max_length=1000)
+
+    @field_validator("evidence_requirements")
+    @classmethod
+    def meaningful_requirements(cls, values):
+        return CreateConditionRequest.meaningful_requirements(values)
 
 
 class VerifyEvidenceRequest(BaseModel):
@@ -93,20 +123,55 @@ def create_compliance_condition(
                 except (IdempotencyConflict, IdempotencyExpired) as e:
                     raise HTTPException(status_code=409)
 
+            application_id = payload.application_id
+            source_approval_id = payload.source_approval_id
+            if payload.source_approval_id:
+                cur.execute("SELECT application_id,decision_status,decision_type FROM public.approval_decisions WHERE id=%s", (payload.source_approval_id,))
+                approval = cur.fetchone()
+                if not approval:
+                    raise HTTPException(404, detail="Source approval was not found")
+                if approval["decision_status"] != "approved" or approval["decision_type"].lower() not in ("approve", "approval"):
+                    raise HTTPException(409, detail="Condition source must be an approved approval decision")
+                if application_id and application_id != approval["application_id"]:
+                    raise HTTPException(422, detail="Source approval must belong to the selected application")
+                application_id = approval["application_id"]
+            # Same lock as final decisions prevents a condition being added while
+            # the application is concurrently closed or rejected.
+            cur.execute("SELECT a.id,a.institution_id,a.status,s.stage_type FROM public.applications a "
+                        "LEFT JOIN public.application_stage_instances si ON si.id=a.current_stage_instance_id "
+                        "LEFT JOIN public.workflow_stages s ON s.id=si.workflow_stage_id WHERE a.id=%s FOR UPDATE OF a", (application_id,))
+            application = cur.fetchone()
+            if not application:
+                raise HTTPException(404, detail="Application was not found")
+            if application["institution_id"] != payload.institution_id:
+                raise HTTPException(422, detail="Application and condition institution must match")
+            if application["status"] != "approved" and not (application["status"] in ("under_review", "resubmitted") and application["stage_type"] == "decision"):
+                raise HTTPException(409, detail="Approval conditions can be added only at the decision stage or to an approved application")
+            if application["status"] == "approved" and not source_approval_id:
+                cur.execute("SELECT id FROM public.approval_decisions WHERE application_id=%s AND decision_status='approved' "
+                            "AND lower(decision_type) IN ('approve','approval') ORDER BY decision_at DESC,id DESC LIMIT 1", (application_id,))
+                approval = cur.fetchone()
+                if not approval:
+                    raise HTTPException(409, detail="Approved application has no approval decision to link this condition")
+                source_approval_id = approval["id"]
+            if payload.due_at is not None and payload.due_at <= now:
+                raise HTTPException(422, detail="Condition due date must be in the future")
+
             cur.execute(
                 "INSERT INTO public.compliance_conditions "
                 "(id, institution_id, application_id, source_approval_id, condition_code, description, "
-                "due_at, status, verification_role_id, created_at, created_by, updated_at, updated_by, version) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, 'open', %s, %s, %s, %s, %s, 1) "
+                "evidence_requirements, due_at, status, verification_role_id, created_at, created_by, updated_at, updated_by, version) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'open', %s, %s, %s, %s, %s, 1) "
                 "RETURNING id, institution_id, application_id, source_approval_id, condition_code, "
-                "description, due_at, status, verification_role_id, created_at, version",
+                "description, evidence_requirements, due_at, status, verification_role_id, created_at, version",
                 (
                     condition_id,
                     payload.institution_id,
-                    payload.application_id,
-                    payload.source_approval_id,
+                    application_id,
+                    source_approval_id,
                     payload.condition_code,
                     payload.description,
+                    Jsonb(payload.evidence_requirements),
                     payload.due_at,
                     payload.verification_role_id,
                     now,
@@ -120,7 +185,8 @@ def create_compliance_condition(
             audit_meta = {
                 "condition_code": payload.condition_code,
                 "institution_id": str(payload.institution_id),
-                "application_id": str(payload.application_id) if payload.application_id else None,
+                "application_id": str(application_id),
+                "evidence_requirements": payload.evidence_requirements,
             }
             append_event(
                 cur,
@@ -167,7 +233,7 @@ def list_compliance_conditions(
 
     query = (
         "SELECT id, institution_id, application_id, source_approval_id, condition_code, "
-        "description, due_at, status, verification_role_id, created_at, version "
+        "description, evidence_requirements, due_at, status, verification_role_id, created_at, version "
         "FROM public.compliance_conditions WHERE 1=1 "
     )
     params: list[Any] = []
@@ -208,6 +274,70 @@ def list_compliance_conditions(
     }
 
 
+@router.patch("/compliance-conditions/{condition_id}")
+def update_condition_requirements(
+    condition_id: UUID,
+    payload: UpdateConditionRequest,
+    request: Request,
+    subject: Annotated[str, Depends(get_verified_subject)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+):
+    """Correct evidence requirements only while their decision remains a draft."""
+    caller = _user(request, subject)
+    write_url = request.app.state.settings.database_write_url
+    if not write_url:
+        raise HTTPException(503)
+    actor = _to_uuid(caller["id"])
+    body = {"condition_id":str(condition_id), **payload.model_dump(mode="json")}
+    operation = "compliance.update_condition_requirements"
+    now = datetime.now(timezone.utc)
+    with compliance_transaction(write_url, caller["subject"]) as cur:
+        if idempotency_key:
+            try:
+                cached = find_result(cur,actor_id=actor,raw_key=idempotency_key,operation=operation,body=body)
+                if cached:
+                    return cached[1]
+            except (IdempotencyConflict,IdempotencyExpired):
+                raise HTTPException(409)
+        # Resolve parent without locking the child first. Decision/closure uses
+        # app -> condition lock order; this avoids a concurrent approval deadlock.
+        cur.execute("SELECT application_id FROM public.compliance_conditions WHERE id=%s",(condition_id,))
+        initial = cur.fetchone()
+        if not initial:
+            raise HTTPException(404,detail="Compliance condition not found")
+        cur.execute("SELECT a.id,a.status,s.stage_type FROM public.applications a "
+                    "LEFT JOIN public.application_stage_instances si ON si.id=a.current_stage_instance_id "
+                    "LEFT JOIN public.workflow_stages s ON s.id=si.workflow_stage_id WHERE a.id=%s FOR UPDATE OF a",(initial["application_id"],))
+        application = cur.fetchone()
+        if not application or application["status"] not in ("under_review","resubmitted") or application["stage_type"]!="decision":
+            raise HTTPException(409,detail="Condition requirements can be edited only before the application decision")
+        cur.execute("SELECT id,application_id,source_approval_id,evidence_requirements,version FROM public.compliance_conditions WHERE id=%s FOR UPDATE",(condition_id,))
+        current = cur.fetchone()
+        if not current:
+            raise HTTPException(404)
+        if current["application_id"]!=application["id"] or current["source_approval_id"] is not None:
+            raise HTTPException(409,detail="An approved condition cannot be edited")
+        if current["version"]!=payload.expected_version:
+            raise HTTPException(412)
+        old = current["evidence_requirements"] or []
+        cur.execute("UPDATE public.compliance_conditions SET evidence_requirements=%s,version=version+1,updated_at=%s,updated_by=%s "
+                    "WHERE id=%s RETURNING id,evidence_requirements,version,updated_at",(Jsonb(payload.evidence_requirements),now,actor,condition_id))
+        updated = cur.fetchone()
+        correlation = _to_uuid(getattr(request.state,"correlation_id",None))
+        metadata={"condition_id":str(condition_id),"application_id":str(application["id"]),
+                  "previous_requirements":old,"evidence_requirements":payload.evidence_requirements,
+                  "old_version":current["version"],"new_version":updated["version"]}
+        append_event(cur,actor_id=actor,action="CONDITION_REQUIREMENTS_UPDATED",entity_type="compliance_condition",
+                     entity_id=condition_id,correlation_id=correlation,reason=payload.reason,metadata=metadata)
+        enqueue(cur,event_type="CONDITION_REQUIREMENTS_UPDATED",entity_type="compliance_condition",
+                entity_id=condition_id,payload=metadata,correlation_id=correlation)
+        result = _serialize(dict(updated))
+        if idempotency_key:
+            store_result(cur,actor_id=actor,raw_key=idempotency_key,operation=operation,body=body,http_status=200,
+                         response_json=result,expires_at=now+timedelta(days=1))
+        return result
+
+
 @router.get("/compliance-conditions/{condition_id}")
 def get_compliance_condition(
     condition_id: UUID,
@@ -224,7 +354,7 @@ def get_compliance_condition(
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 "SELECT id, institution_id, application_id, source_approval_id, condition_code, "
-                "description, due_at, status, verification_role_id, created_at, version "
+                "description, evidence_requirements, due_at, status, verification_role_id, created_at, version "
                 "FROM public.compliance_conditions WHERE id = %s",
                 (condition_id,),
             )
@@ -286,7 +416,7 @@ def submit_condition_evidence(
     correlation_id = getattr(request.state, "correlation_id", None)
     corr_uuid = _to_uuid(correlation_id)
     operation = "compliance.submit_evidence"
-    body_dict = payload.model_dump(mode="json")
+    body_dict = {"condition_id": str(condition_id), **payload.model_dump(mode="json")}
     now = datetime.now(timezone.utc)
     submission_id = uuid4()
     if len(set(payload.document_version_ids)) != len(payload.document_version_ids):
@@ -413,7 +543,7 @@ def verify_evidence_submission(
     correlation_id = getattr(request.state, "correlation_id", None)
     corr_uuid = _to_uuid(correlation_id)
     operation = "compliance.verify_evidence"
-    body_dict = payload.model_dump(mode="json")
+    body_dict = {"submission_id": str(submission_id), **payload.model_dump(mode="json")}
     now = datetime.now(timezone.utc)
     verification_id = uuid4()
 
@@ -540,7 +670,7 @@ def close_compliance_condition(
     correlation_id = getattr(request.state, "correlation_id", None)
     corr_uuid = _to_uuid(correlation_id)
     operation = "compliance.close_condition"
-    body_dict = payload.model_dump(mode="json")
+    body_dict = {"condition_id": str(condition_id), **payload.model_dump(mode="json")}
     now = datetime.now(timezone.utc)
 
     try:
@@ -625,7 +755,7 @@ def reopen_compliance_condition(
     correlation_id = getattr(request.state, "correlation_id", None)
     corr_uuid = _to_uuid(correlation_id)
     operation = "compliance.reopen_condition"
-    body_dict = payload.model_dump(mode="json")
+    body_dict = {"condition_id": str(condition_id), **payload.model_dump(mode="json")}
     now = datetime.now(timezone.utc)
 
     try:
@@ -637,6 +767,20 @@ def reopen_compliance_condition(
                         return prior[1]
                 except (IdempotencyConflict, IdempotencyExpired) as e:
                     raise HTTPException(status_code=409)
+
+            cur.execute("SELECT COALESCE(c.application_id,d.application_id) AS application_id FROM public.compliance_conditions c "
+                        "LEFT JOIN public.approval_decisions d ON d.id=c.source_approval_id WHERE c.id=%s",(condition_id,))
+            parent = cur.fetchone()
+            if not parent:
+                raise HTTPException(404,detail="Compliance condition not found")
+            # Serialize reopening with case closure, using the same app->child
+            # order so a closed case cannot acquire an open condition afterward.
+            cur.execute("SELECT id,status FROM public.applications WHERE id=%s FOR UPDATE",(parent["application_id"],))
+            application = cur.fetchone()
+            if not application:
+                raise HTTPException(404,detail="Condition application was not found")
+            if application["status"] == "closed":
+                raise HTTPException(409,detail="Reopen the application before reopening this condition")
 
             cur.execute(
                 "SELECT id, status, version FROM public.compliance_conditions WHERE id = %s FOR UPDATE",

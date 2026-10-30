@@ -1,0 +1,30 @@
+{
+  "application_id": "76e9a91b-343a-5d90-8f73-8f96b7b83603",
+  "condition_id": "0def79df-6df3-401c-ba69-e8a9a1d93c9c",
+  "demo_only": true,
+  "documents": [],
+  "submission": {
+    "id": "79d3ad19-355c-4b1b-917c-d2afa0c7a4c6",
+    "conditionId": "0def79df-6df3-401c-ba69-e8a9a1d93c9c",
+    "submissionNumber": 1,
+    "submittedAt": "2026-10-30T08:08:37.195443+00:00",
+    "submittedBy": "141ddc58-1483-5bf5-adf3-308953de2da3",
+    "documentVersionIds": [
+      "3f078371-09d8-40cb-b035-ea4758711b56",
+      "977a76e6-8f94-485a-8f65-c863f0ba803a"
+    ],
+    "responseToVerificationId": null
+  },
+  "existing_verifications": [
+    {
+      "id": "559ba2e9-4c99-40a0-b5f3-77dd196db9ce",
+      "evidenceId": "79d3ad19-355c-4b1b-917c-d2afa0c7a4c6",
+      "reviewerId": "1790ff42-f9a4-5866-bd57-c3077df17810",
+      "result": "COMPLIANT",
+      "comments": "PWD structural safety attestation and geotagged retrofitting photographs verified compliant with seismic safety standards.",
+      "at": "2026-10-30T08:20:50.893474+00:00"
+    }
+  ],
+  "condition_status": "VERIFIED_COMPLIANT",
+  "action": "Existing evidence and any recorded determination preserved; no duplicates created"
+}

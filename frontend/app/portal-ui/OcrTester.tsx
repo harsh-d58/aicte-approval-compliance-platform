@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { s, useWorkspace, Table, Badge } from "./domain-ui";
 import { useLive } from "./LiveProvider";
+import { isDemoMode } from "@/lib/portal/mode";
+import DemoOcrTester from "./DemoOcrTester";
 
 export type OcrExtractionResult = {
   status: string;
@@ -31,7 +33,7 @@ export type OcrExtractionResult = {
   source_error: string | null;
 };
 
-type Props = {
+export type Props = {
   documentId?: string;
   versionId?: string;
   declaredIssueDate?: string | null;
@@ -40,7 +42,11 @@ type Props = {
   title?: string;
 };
 
-export function OcrTester({
+export function OcrTester(props:Props) {
+  return isDemoMode ? <DemoOcrTester {...props}/> : <LiveOcrTester {...props}/>;
+}
+
+function LiveOcrTester({
   documentId,
   versionId,
   declaredIssueDate,

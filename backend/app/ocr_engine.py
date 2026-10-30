@@ -62,9 +62,9 @@ def parse_statutory_fields(text: str) -> dict[str, str | None]:
             "issuing_authority": None,
         }
 
-    # 1. Certificate / Reference Number
+    # 1. Certificate / Reference Number / Application ID
     cert_pattern = re.compile(
-        r"(?:Certificate|Registration|Sanction|Approval|Deed|Ref(?:erence)?)(?:[ \t]*(?:/|and)[ \t]*Reference)?[ \t]*(?:No\.?|Number|#)[ \t]*[:.\-]?[ \t]*([A-Za-z0-9][A-Za-z0-9/\-_]{3,49})",
+        r"(?:Certificate|Registration|Sanction|Approval|Deed|Application(?:\s*ID)?|Ref(?:erence)?)(?:[ \t]*(?:/|and)[ \t]*Reference)?[ \t]*(?:No\.?|Number|#|\.)?[ \t]*[:.\-]?[ \t]*([A-Za-z0-9][A-Za-z0-9/\-_]{3,49})",
         re.IGNORECASE,
     )
     cert_match = cert_pattern.search(text)
@@ -79,6 +79,10 @@ def parse_statutory_fields(text: str) -> dict[str, str | None]:
         dfs_match = re.search(r"\b(DFS\/[A-Za-z0-9\/\-_]{4,40})\b", text)
         if dfs_match:
             cert_num = dfs_match.group(1).strip()
+    if not cert_num:
+        app_id_match = re.search(r"\b(?:Application\s*ID[.:\s]+)([0-9]{6,20})\b", text, re.IGNORECASE)
+        if app_id_match:
+            cert_num = app_id_match.group(1).strip()
 
     # 2. Issue Date
     issue_pattern = re.compile(
@@ -95,6 +99,22 @@ def parse_statutory_fields(text: str) -> dict[str, str | None]:
     )
     expiry_match = expiry_pattern.search(text)
     expiry_date = expiry_match.group(1).strip() if expiry_match else None
+
+    if not expiry_date and issue_date:
+        period_match = re.search(r"period\s+of\s+(\d+)\s+years?", text, re.IGNORECASE)
+        if period_match:
+            try:
+                years = int(period_match.group(1))
+                parts = re.split(r"[\-\/.\s]", issue_date)
+                if len(parts) == 3:
+                    if len(parts[0]) == 4:
+                        y, m, d = int(parts[0]), int(parts[1]), int(parts[2])
+                        expiry_date = f"{y + years:04d}-{m:02d}-{d:02d}"
+                    else:
+                        d, m, y = int(parts[0]), int(parts[1]), int(parts[2])
+                        expiry_date = f"{d:02d}-{m:02d}-{y + years:04d}"
+            except Exception:
+                pass
 
     # 4. Issuing Authority
     auth_pattern = re.compile(
@@ -117,6 +137,10 @@ def parse_statutory_fields(text: str) -> dict[str, str | None]:
 
 def preprocess_image(image: Image.Image) -> Image.Image:
     """Enhance scanned images for OCR accuracy (grayscale, auto-contrast, mild sharpening)."""
+    max_dim = 1400
+    if max(image.width, image.height) > max_dim:
+        image = image.copy()
+        image.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
     # Convert to grayscale
     gray = image.convert("L")
     # Auto-adjust contrast
@@ -136,7 +160,8 @@ Image.MAX_IMAGE_PIXELS = MAX_PIXELS
 def _rapid_engine():
     from rapidocr import RapidOCR
     # Bundled ONNX models; no fixture text or metadata inputs.
-    return RapidOCR(params={"EngineConfig.onnxruntime.intra_op_num_threads": 2,
+    threads = min(6, os.cpu_count() or 4)
+    return RapidOCR(params={"EngineConfig.onnxruntime.intra_op_num_threads": threads,
                            "EngineConfig.onnxruntime.inter_op_num_threads": 2})
 
 

@@ -1,12 +1,15 @@
 "use client";
 import { useState } from "react";
+import CorrectionEvidencePicker from "./CorrectionEvidencePicker";
+import DecisionAndClosure from "./DecisionAndClosure";
 import { useWorkspace, Page, Panel, Links, Field, ActionForm, ReasonAction, Table, Unavailable, Meta, Versions, valuesOf, optionsOf, Link, Badge, s, formatDateTime, humanize } from "./domain-ui";
 export default function ApplicationFlows({ mode }: {
     mode: "new" | "edit" | "review" | "deficiency" | "decision";
 }) {
-    const { data, params, allowed, router, execute } = useWorkspace();
+    const { data, params, allowed, router, execute, reload } = useWorkspace();
     const [itemCount, setItemCount] = useState(1);
     const [resolvingId, setResolvingId] = useState<string | null>(null);
+    const [resolutionError, setResolutionError] = useState("");
     if (!data)
         return null;
     const app = data.applications.find(a => a.id === params.applicationId);
@@ -47,6 +50,8 @@ export default function ApplicationFlows({ mode }: {
       }
       return {
         items: items.length > 0 ? items : [{ criterion: String(fd.get("criterion_0") || "General"), description: String(fd.get("description_0") || "Required compliance correction"), documentId: fd.get("documentId_0") || null }],
+        dueAt: fd.get("dueAt") || "",
+        reason: fd.get("reason") || "Deficiency notice issued during scrutiny",
       };
     }}
   >
@@ -118,14 +123,16 @@ export default function ApplicationFlows({ mode }: {
             Evidentiary Document Version: {i.responseVersionId ? `v${i.responseVersionId}` : "None attached"}
           </p>
           
-          {allowed("SCRUTINY", "REGIONAL") && (i.status === "RESPONDED" || i.status === "OPEN") && (
+          {allowed("SCRUTINY", "REGIONAL") && i.status === "OPEN" && <p className={s.note}>Awaiting the institution's submitted response. Accept or return the item after its response is submitted.</p>}
+          {allowed("SCRUTINY", "REGIONAL") && i.status === "RESPONDED" && (
             <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               <button
                 type="button"
                 className={s.button}
-                disabled={resolvingId === i.id}
+                disabled={Boolean(resolvingId)}
                 onClick={async () => {
                   setResolvingId(i.id);
+                  setResolutionError("");
                   try {
                     await execute({
                       kind: "deficiency.resolve",
@@ -133,6 +140,9 @@ export default function ApplicationFlows({ mode }: {
                       expectedVersion: app.version,
                       values: { itemId: i.id, resolution: "ACCEPTED", reason: `Item #${idx + 1} (${i.criterion}) accepted by scrutiny officer` }
                     });
+                  } catch (cause) {
+                    setResolutionError(cause instanceof Error ? `${cause.message} Reloading this notice; only submitted responses can be reviewed.` : "Unable to accept this item. Reload the notice and check its response status.");
+                    reload();
                   } finally {
                     setResolvingId(null);
                   }
@@ -144,9 +154,10 @@ export default function ApplicationFlows({ mode }: {
                 type="button"
                 className={s.button}
                 style={{ backgroundColor: "rgba(220, 38, 38, 0.1)", borderColor: "#dc2626", color: "#dc2626" }}
-                disabled={resolvingId === i.id}
+                disabled={Boolean(resolvingId)}
                 onClick={async () => {
                   setResolvingId(i.id);
+                  setResolutionError("");
                   try {
                     await execute({
                       kind: "deficiency.resolve",
@@ -154,6 +165,9 @@ export default function ApplicationFlows({ mode }: {
                       expectedVersion: app.version,
                       values: { itemId: i.id, resolution: "REJECTED", reason: `Item #${idx + 1} rejected: revision required` }
                     });
+                  } catch (cause) {
+                    setResolutionError(cause instanceof Error ? `${cause.message} Reloading this notice; only submitted responses can be reviewed.` : "Unable to return this item. Reload the notice and check its response status.");
+                    reload();
                   } finally {
                     setResolvingId(null);
                   }
@@ -166,6 +180,7 @@ export default function ApplicationFlows({ mode }: {
         </div>
       ))}
     </div>
+    {resolutionError && <p role="alert" className={s.error}>{resolutionError}</p>}
   </Panel>
 
   {allowed("INSTITUTION") && notice.status === "OPEN" && (
@@ -175,10 +190,15 @@ export default function ApplicationFlows({ mode }: {
         id={notice.id}
         version={app.version}
         submit="Submit Comprehensive Response"
-        build={fd => ({ documentVersionIds: valuesOf(fd, "versionIds") })}
+        build={fd => ({ itemResponses: notice.items.filter(item => item.status !== "RESOLVED").map(item => ({ itemId: item.id, versionId: String(fd.get(`evidence-${item.id}`) ?? ""), narrative: String(fd.get("response") ?? "") })) })}
       >
         <Field name="response" label="Institutional Explanatory Narrative & Rectification Actions" type="textarea" />
-        <Versions institutionId={app.institutionId} />
+        <p className={s.note}>Upload the corrected file first, then select its exact version for each item. Entering a certificate reference above does not upload a document.</p>
+        {notice.items.filter(item => item.status !== "RESOLVED").map(item => {
+          return <fieldset key={item.id} className={s.item}><legend>{item.criterion || "Deficiency item"}</legend><p>{item.description}</p>
+            <CorrectionEvidencePicker applicationId={app.id} noticeId={notice.id} itemId={item.id} />
+          </fieldset>;
+        })}
       </ActionForm>
     </Panel>
   )}
@@ -189,6 +209,6 @@ export default function ApplicationFlows({ mode }: {
     </Panel>
   )}
 </>}
- {mode === "decision" && app && <><Panel title="Decision history"><Table columns={["Outcome", "Authority", "At (IST)", "Reason"]} rows={data.decisions.filter(d => d.applicationId === app.id).map(d => [d.type, data.users.find(u => u.id === d.authorityId)?.displayName, formatDateTime(d.at), d.reason])}/>{app.closure && <p>Closure authority: {data.users.find(u => u.id === app.closure?.authorityId)?.displayName} · {app.closure.reason}</p>}</Panel>{allowed("REGIONAL") && <><div className={s.grid}><Panel title="Authorised decision"><ReasonAction kind="decision.record" id={app.id} version={app.version} label="Record decision"><Field name="outcome" label="Decision" options={optionsOf(["APPROVE", "REJECT", "CLOSE"])}/><p className={s.note}>Approval requires the configured review route. Closure requires all approval conditions to be verified and closed.</p></ReasonAction></Panel><Panel title="Add approval condition"><ActionForm kind="condition.create" id={app.id} submit="Create condition"><Field name="description" label="Condition / undertaking" type="textarea"/><Field name="requirements" label="Evidence required (one per line)" type="textarea"/><Field name="dueAt" label="Due (IST)" type="datetime-local"/></ActionForm></Panel></div><Panel title="Explicit workflow migration"><ReasonAction kind="application.migrate" id={app.id} version={app.version} label="Migrate active case"><Field name="workflowId" label="Compatible published workflow" options={data.workflows.filter(w => w.status === "PUBLISHED" && w.id !== app.workflowId && w.stages.some(st => st.code === app.currentStage)).map(w => ({ id: w.id, name: `${w.name} · ${w.version}` }))}/><p className={s.note}>Migration preserves existing submissions and records its previous and new workflow references in the timeline.</p></ReasonAction></Panel><Panel title="Case lifecycle"><ReasonAction kind={app.closure ? "application.reopen" : "application.cancel"} id={app.id} version={app.version} label={app.closure ? "Reopen case" : "Withdraw case"}/></Panel></>}</>}
+ {mode === "decision" && app && <DecisionAndClosure applicationId={app.id}/>}
  </Page>;
 }

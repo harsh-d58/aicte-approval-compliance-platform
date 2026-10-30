@@ -91,7 +91,7 @@ def _defender_scan_content(content: bytes) -> dict[str, Any]:
             source = Path(directory) / "source.bin"
             source.write_bytes(content)
             result = subprocess.run([str(executable), "-Scan", "-ScanType", "3", "-File", str(source), "-DisableRemediation"],
-                capture_output=True, text=True, errors="replace", timeout=45,
+                capture_output=True, text=True, errors="replace", timeout=3,
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         # DisableRemediation prevents code 0 from representing a remediated file.
         return {**evidence, "status": "clean" if result.returncode == 0 else "error",

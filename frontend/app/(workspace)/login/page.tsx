@@ -9,6 +9,7 @@ import { roleNames, safeReturnTo } from "@/lib/portal/view-models";
 import type { Role } from "@/lib/portal/types";
 import { useDemo } from "@/app/portal-ui/DemoProvider";
 import { useLive } from "@/app/portal-ui/LiveProvider";
+import { isDemoMode } from "@/lib/portal/mode";
 import { Arrow, Brand } from "@/app/portal-ui/ui";
 import s from "@/app/portal-ui/portal.module.css";
 
@@ -40,33 +41,29 @@ const staticPersonas: { id: string; role: Role; name: string }[] = [
 
 export default function LoginPage() {
   const [authMode, setAuthMode] = useState<"demo" | "live">("demo");
-  const { allData, error, signIn, reload, user } = useDemo();
+  const { error, signIn, reload, user } = useDemo();
   const [selected, setSelected] = useState("user-institution");
   const [submitting, setSubmitting] = useState(false);
   const [loginError, setLoginError] = useState("");
   const router = useRouter();
 
-  const distinctPersonas = allData?.users.filter(
-    (u, index, users) =>
-      users.findIndex((other) => other.assignments[0]?.role === u.assignments[0]?.role) === index
-  );
-  const personas = distinctPersonas && distinctPersonas.length >= 10
-    ? distinctPersonas.map(u => ({ id: u.id, role: u.assignments[0].role, name: u.displayName }))
-    : staticPersonas;
+  // These are stable /prototype/session keys, not database user UUIDs.
+  const personas = staticPersonas;
 
   const selectedPersona = personas.find((p) => p.id === selected) ?? personas[0];
 
   async function enterDemo() {
     if (submitting) return;
     setSubmitting(true);
-    try { await signIn(selectedPersona.id); } catch (cause) { setLoginError(cause instanceof Error ? cause.message : "Unable to open demo workspace."); setSubmitting(false); return; }
-    const destination = safeReturnTo(new URLSearchParams(window.location.search).get("returnTo"));
-    const userObj = allData?.users.find((u) => u.id === selectedPersona.id);
-    router.push(
-      userObj && userObj.assignments.length > 1
-        ? `/portal/access?returnTo=${encodeURIComponent(destination)}`
-        : destination
-    );
+    setLoginError("");
+    try {
+      await signIn(selectedPersona.id);
+      router.push(safeReturnTo(new URLSearchParams(window.location.search).get("returnTo")));
+    } catch (cause) {
+      setLoginError(cause instanceof Error ? cause.message : "Unable to open demo workspace.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -108,7 +105,7 @@ export default function LoginPage() {
         <section className={s.authCard} aria-labelledby="signin-title">
           <span className={s.eyebrow}>AICTE STATUTORY PORTAL</span>
           <h2 id="signin-title">Choose your workspace.</h2>
-          <p>Select any of the 10 demonstration roles or connect with live database credentials.</p>
+          <p>Select any of the 10 demonstration roles or sign in with your Supabase account.</p>
 
           {/* Mode Switcher Tabs */}
           <div
@@ -142,7 +139,7 @@ export default function LoginPage() {
                 boxShadow: authMode === "demo" ? "0 2px 8px rgba(0,0,0,0.08)" : "none",
               }}
             >
-              👥 10 Role Personas (Instant)
+              👥 10 Role Personas
             </button>
             <button
               type="button"
@@ -163,7 +160,7 @@ export default function LoginPage() {
                 boxShadow: authMode === "live" ? "0 2px 8px rgba(0,0,0,0.08)" : "none",
               }}
             >
-              🔐 Live Database (PostgreSQL)
+              🔐 Supabase sign-in
             </button>
           </div>
 
@@ -174,15 +171,14 @@ export default function LoginPage() {
                 <span className={s.demoChip}>1-Click Access</span>
               </div>
 
-              {(error || loginError) ? (
+              {(error || loginError) && (
                 <div role="alert">
-                  <p>{error || loginError}</p>
+                  <p>{loginError || error}</p>
                   <button onClick={() => { setLoginError(""); reload(); }} className={s.secondaryButton}>
                     Try again
                   </button>
                 </div>
-              ) : (
-                <>
+              )}
                   <div className={s.roleGrid} role="group" aria-label="10 Demonstration roles">
                     {personas.map((person) => {
                       const role = person.role;
@@ -192,7 +188,7 @@ export default function LoginPage() {
                           key={person.id}
                           className={s.roleButton}
                           aria-pressed={selected === person.id}
-                          onClick={() => setSelected(person.id)}
+                          onClick={() => { setSelected(person.id); setLoginError(""); }}
                         >
                           <Icon name={icons[role]} size={17} />
                           <span>{roleNames[role]}</span>
@@ -212,7 +208,7 @@ export default function LoginPage() {
                       <span>
                         <strong>{selectedPersona.name}</strong>
                         <small>
-                          {roleNames[selectedPersona.role]} · Instant sign-in (No password)
+                          {roleNames[selectedPersona.role]} · Demonstration sign-in (No password)
                         </small>
                       </span>
                     </div>
@@ -234,12 +230,10 @@ export default function LoginPage() {
                       <Arrow />
                     </Link>
                   )}
-                </>
-              )}
 
               <p className={s.authDisclaimer}>
                 Full functional prototype with all 10 role-based workflows and Power-BI analytics.<br />
-                Your actions are saved to the shared prototype database.
+            {isDemoMode ? "Business actions are saved in this browser. Supabase sign-in opens a synthetic institutional workspace." : "Your actions are saved to the shared prototype database."}
               </p>
             </>
           ) : (
@@ -278,10 +272,9 @@ function LiveLoginForm() {
     setError("");
     try {
       await signIn(email, password);
-      const requested = new URLSearchParams(window.location.search).get("returnTo");
-      router.replace(requested?.startsWith("/portal") && !requested.startsWith("//") ? requested : "/portal");
+      router.replace(safeReturnTo(new URLSearchParams(window.location.search).get("returnTo")));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Sign-in failed. Check database credentials.");
+      setError(cause instanceof Error ? cause.message : "Sign-in failed. Check your Supabase account details.");
     } finally {
       setBusy(false);
     }
@@ -290,9 +283,9 @@ function LiveLoginForm() {
   return (
     <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "8px" }}>
       <div style={{ fontSize: "11px", color: "#475569", background: "#f8fafc", padding: "10px 12px", borderRadius: "8px", border: "1px solid #e2e8f0", lineHeight: "1.6" }}>
-        <strong>Live PostgreSQL & Supabase Engine</strong>
+        <strong>Supabase account sign-in</strong>
         <p style={{ margin: "3px 0 0", color: "#64748b" }}>
-          Authenticates against the live backend with Row-Level Security (RLS) policies.
+          Supabase verifies your account. The portal checks your assigned roles and workspace access.
         </p>
       </div>
 
@@ -349,7 +342,7 @@ function LiveLoginForm() {
         disabled={!configured || loading || busy}
         style={{ width: "100%", marginTop: "6px" }}
       >
-        {busy ? "Authenticating with database…" : "Sign in to Live Database"}
+        {busy ? "Signing in…" : "Sign in with Supabase"}
       </button>
     </form>
   );

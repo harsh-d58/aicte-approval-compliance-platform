@@ -7,7 +7,8 @@ from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ['020_document_file_invariants.sql', '030_access_workflow_history.sql',
-         '031_typed_configuration_revisions.sql', '040_durable_communications.sql']
+         '031_typed_configuration_revisions.sql', '040_durable_communications.sql',
+         '050_condition_evidence_requirements.sql']
 
 
 def main():

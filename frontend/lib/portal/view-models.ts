@@ -40,6 +40,7 @@ export function scopeName(data: PortalCollections, user: User, index: number) {
   if (scope.type === "GLOBAL") return "All authorised regions";
   if (scope.type === "INSTITUTION") return data.institutions.find(i => i.id === scope.id)?.name ?? scope.id;
   if (scope.type === "REGION") return data.regions.find(r => r.id === scope.id)?.name ?? scope.id;
+  if (scope.type === "APPLICATION") return `Assigned application · ${data.applications.find(application => application.id === scope.id)?.number ?? scope.id}`;
   return scope.type === "EVC" ? `Assigned committee · ${scope.id.replace("visit-", "EVC ")}` : scope.id;
 }
 
@@ -47,6 +48,7 @@ export function scopeName(data: PortalCollections, user: User, index: number) {
 export function scopedSnapshot(data: PortalCollections, user: User, index: number): PortalCollections {
   const { role, scope } = user.assignments[index];
   const expertVisit = scope.type === "EVC" ? data.visits.find(v => v.id === scope.id && v.committee.some(m => data.experts.some(e => e.id === m.expertId && e.userId === user.id))) : undefined;
+  const expertVisits = role === "EVC_EXPERT" ? data.visits.filter(v => v.committee.some(m => data.experts.some(e => e.id === m.expertId && e.userId === user.id))) : [];
   const applications = data.applications.filter(a => {
     const institution = data.institutions.find(i => i.id === a.institutionId);
     const within = scope.type === "GLOBAL" || (scope.type === "REGION" && institution?.regionId === scope.id)
@@ -57,7 +59,7 @@ export function scopedSnapshot(data: PortalCollections, user: User, index: numbe
   const appIds = new Set(applications.map(a => a.id));
   const institutions = data.institutions.filter(i => scope.type === "GLOBAL" || (scope.type === "REGION" && role !== "SCRUTINY" && i.regionId === scope.id) || applications.some(a => a.institutionId === i.id) || (scope.type === "INSTITUTION" && i.id === scope.id));
   const institutionIds = new Set(institutions.map(i => i.id));
-  const visits = data.visits.filter(v => appIds.has(v.applicationId) && (role !== "EVC_EXPERT" || ((scope.type === "EVC" ? v.id === scope.id : appIds.has(v.applicationId)) && v.committee.some(m => data.experts.some(e => e.id === m.expertId && e.userId === user.id)))));
+  const visits = data.visits.filter(v => appIds.has(v.applicationId) && (role !== "EVC_EXPERT" || ((scope.type === "EVC" ? v.id === scope.id : appIds.has(v.applicationId)) && expertVisits.some(assigned => assigned.id === v.id))));
   const visitIds = new Set(visits.map(v => v.id));
   const documents = data.documents.filter(d => role !== "EVC_EXPERT" && institutionIds.has(d.institutionId) && (!d.applicationId || appIds.has(d.applicationId)));
   const selectedExperts = new Set(visits.flatMap(v=>v.committee.map(m=>m.expertId)));

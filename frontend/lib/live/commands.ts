@@ -1,5 +1,6 @@
 import type { Command } from "@/lib/portal/commands";
 import type { PortalCollections } from "@/lib/portal/types";
+import { deficiencyResponses } from "./deficiency-evidence";
 
 /** The provider owns tokens and refreshes the snapshot only after this resolves. */
 export interface LiveCommandClient {
@@ -112,25 +113,24 @@ export async function executeLiveCommand(
       const rawItems = Array.isArray(values.items) && values.items.length > 0
         ? (values.items as Array<Record<string, unknown>>)
         : [{ criterion: text(values.criterion), description: text(values.description), documentId: text(values.documentId) || null }];
+      const dueParsed = values.dueAt ? Math.ceil((Date.parse(text(values.dueAt)) - Date.now()) / 86400000) : 14;
+      const responseDueDays = Number.isFinite(dueParsed) && dueParsed > 0 ? Math.max(1, Math.min(180, dueParsed)) : 14;
+      const noticeReason = text(values.reason) || reason || "Deficiency notice issued during scrutiny";
       response = await post(`/applications/${id}/deficiency-notices`, {
-        response_due_days: Math.max(1, Math.min(180, Math.ceil((Date.parse(text(values.dueAt)) - Date.now()) / 86400000))),
+        response_due_days: responseDueDays,
         items: rawItems.map(it => ({
           criterion_code: String(it.criterion ?? "General"),
           description: String(it.description ?? ""),
           related_document_id: it.documentId ? String(it.documentId) : null,
         })),
-        reason,
+        reason: noticeReason.length >= 3 ? noticeReason : "Deficiency notice issued during scrutiny",
       });
       returnedId = resultId(response);
       break;
     }
     case "deficiency.respond": {
-      const notice = data.deficiencies.find(n => n.id === id);
-      if (!notice) throw new Error("Deficiency notice unavailable.");
-      const versionIds = list(values.versionIds);
-      const document = data.documents.find(d => d.versions.some(v => versionIds.includes(v.id)));
       response = await post(`/deficiency-notices/${id}/responses`, {
-        item_responses: notice.items.map(item => ({ item_id: item.id, related_document_id: document?.id ?? item.documentId, narrative: text(values.response) || "Compliance correction provided." })),
+        item_responses: deficiencyResponses(data, id, values),
         reason: text(values.response) || reason,
       });
       break;
@@ -139,22 +139,30 @@ export async function executeLiveCommand(
       const notice = data.deficiencies.find(n => n.id === id);
       if (!notice?.items.length) throw new Error("Deficiency notice unavailable.");
       if (values.itemId) {
+        const item = notice.items.find(item => item.id === values.itemId);
+        if (!item || item.status !== "RESPONDED") throw new Error("The institution must submit this item's response before it can be reviewed. Refresh the notice if it was just submitted.");
         const resStatus = values.resolution === "REJECTED" ? "rejected" : values.resolution === "WAIVED" ? "waived" : "accepted";
         await post(`/deficiency-items/${values.itemId}/resolve`, { resolution_status: resStatus, reason });
       } else {
-        for (const item of notice.items.filter(item => item.status !== "RESOLVED")) {
-          await post(`/deficiency-items/${item.id}/resolve`, { resolution_status: "accepted", reason });
+        const submitted = notice.items.filter(item => item.status === "RESPONDED");
+        if (!submitted.length) throw new Error("No submitted item responses are ready for review.");
+        for (const item of submitted) {
+          await client.post(`/deficiency-items/${item.id}/resolve`, { resolution_status: "accepted", reason }, {...headers,"Idempotency-Key":crypto.randomUUID()});
         }
       }
       response = { id };
       break;
     }
-    case "decision.record":
+    case "decision.record": {
+      const outcome = text(values.outcome).toUpperCase();
+      const statuses: Record<string, string> = {APPROVE:"approved",REJECT:"rejected",CLOSE:"approved"};
+      if (!statuses[outcome]) throw new Error("Choose Approve, Reject or Close.");
       response = await post(`/applications/${id}/decisions`, {
-        decision_type: text(values.outcome).toLowerCase(), decision_status: "approved",
-        decision_authority: "Prototype regional authority", reason, expected_version: version,
+        decision_type: outcome.toLowerCase(), decision_status: statuses[outcome],
+        decision_authority: text(values.authority) || "Prototype authorised decision officer", reason, expected_version: version,
       });
       break;
+    }
     case "document.check": {
       const versionId = text(values.versionId) || data.documents.find(d => d.id === id)?.currentVersionId;
       if (!versionId) throw new Error("Choose an available document version.");
@@ -189,8 +197,11 @@ export async function executeLiveCommand(
       break;
     }
     case "visit.confirm": {
+      const visit = data.visits.find(visit => visit.id === id);
+      if (visit?.status === "CONFIRMED") throw new Error("This visit is already confirmed. Refresh to see its saved schedule.");
       const slot = data.slots.find(s => s.id === values.slotId && s.visitId === id);
       if (!slot) throw new Error("Choose an available proposed slot.");
+      if (!slot.feasible || !(Date.parse(slot.expiresAt) > Date.now())) throw new Error("This recommendation expired. Generate fresh recommendations before confirming.");
       response = await post(`/evc-visits/${id}/confirm-schedule`, {
         slot_recommendation_id: slot.id, confirmed_start_at: slot.startAt, confirmed_end_at: slot.endAt, reason,
       });
@@ -220,14 +231,23 @@ export async function executeLiveCommand(
       if (!app) throw new Error("Application unavailable.");
       response = await post("/compliance-conditions", {
         institution_id: app.institutionId, application_id: id,
-        source_approval_id: data.decisions.find(d => d.applicationId === id && d.type === "APPROVE")?.id,
+        source_approval_id: data.decisions.find(d => d.applicationId === id && d.type === "APPROVE" && d.status === "APPROVED")?.id,
         condition_code: `COND-${Date.now()}`, description: values.description, due_at: values.dueAt,
+        evidence_requirements: text(values.requirements).split(/\r?\n/).map(value => value.trim()).filter(Boolean),
       });
       returnedId = resultId(response);
       break;
     }
+    case "condition.update": {
+      const condition = data.conditions.find(row => row.id === id);
+      response = await client.patch<Row>(`/compliance-conditions/${id}`, {
+        evidence_requirements:text(values.requirements).split(/\r?\n/).map(value => value.trim()).filter(Boolean),
+        expected_version:condition?.version ?? command.expectedVersion, reason,
+      }, headers);
+      break;
+    }
     case "evidence.submit":
-      response = await post(`/compliance-conditions/${id}/evidence-submissions`, { document_version_ids: list(values.versionIds), remarks: reason });
+      response = await post(`/compliance-conditions/${id}/evidence-submissions`, { document_version_ids: list(values.documentVersionIds ?? values.versionIds), remarks: reason });
       break;
     case "evidence.verify": {
       const evidence = data.evidence.filter(e => e.conditionId === id).sort((a, b) => b.submissionNumber - a.submissionNumber)[0];

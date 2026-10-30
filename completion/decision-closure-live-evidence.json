@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "condition and evidence checklist persist in real PostgreSQL transaction",
+    "reject records rejection rather than approval (isolated savepoint rolled back)",
+    "approval leaves case open and links undertaking to approval record",
+    "case closure rejected while condition is open",
+    "submitted evidence alone does not permit closure",
+    "independent compliance officer verifies latest institution evidence",
+    "compliance role can explicitly close verified condition",
+    "explicit case closure preserves original approval and records closed timestamp",
+    "all lifecycle operations have atomic audit evidence",
+    "test application and all related mutations rolled back"
+  ],
+  "all_rolled_back": true
+}

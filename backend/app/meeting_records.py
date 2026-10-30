@@ -92,7 +92,11 @@ def _advance_evc_to_decision(cur, report, caller_id, now, reason, correlation_id
     completed=cur.fetchone()['completed']
     passed,_=evaluate_guard(edge['guard_rule'],{'caller_roles':roles,'current_status':app['status'],
         'unresolved_deficiency_count':unresolved,'completed_evc':completed,'approved_meeting_record':True})
-    if unresolved or not passed or not completed:
+    if not completed:
+        raise HTTPException(409,detail='Complete the EVC visit before approving its report')
+    if unresolved:
+        raise HTTPException(409,detail='Resolve all deficiency items before approving the EVC report')
+    if not passed:
         raise HTTPException(409,detail='Configured EVC transition prerequisites are not satisfied')
     cur.execute("UPDATE public.application_stage_instances SET status='completed',completed_at=%s WHERE id=%s", (now,app['current_stage_instance_id']))
     due_at=now+timedelta(days=edge['default_sla_days']) if edge.get('default_sla_days') else None

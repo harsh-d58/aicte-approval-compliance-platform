@@ -1,0 +1,127 @@
+{
+  "valid": true,
+  "simulation": false,
+  "simulated_event_id": null,
+  "total_events": 634,
+  "genesis_hash": "5f71ee1aa28c80026534518337a0535cf7371d266f9e8f6aaaa7306dcc4226b2",
+  "head_hash": "68fb5133f2a974f52088fa53d128d429f0c682bd64cc6fe7b4188445c309bb5a",
+  "verified_at": "2026-10-30T09:06:21.892566+00:00",
+  "errors": [],
+  "immutable_triggers_active": true,
+  "active_triggers": [
+    "audit_events_no_update_delete",
+    "audit_events_no_truncate"
+  ],
+  "recent_blocks": [
+    {
+      "id": "b130a916-5bc7-4d09-85c8-b08693eb4d76",
+      "action": "DEMO_EVC_PREREQUISITE_PREPARED",
+      "actor_id": "23e04761-ea6f-5fdc-a0e8-08b8e35b40e3",
+      "entity_type": "application",
+      "entity_id": "76e9a91b-343a-5d90-8f73-8f96b7b83603",
+      "event_at": "2026-10-30T07:33:06.867636+00:00",
+      "previous_hash": "e906b507d39fde7dbf75246cdd4736215c1f1555b1288127eb4d3078494eaba9",
+      "event_hash": "db6d8478f912c12ae913953908b5062a95515d61264b4bbe416f93d30331f5fa",
+      "valid": true
+    },
+    {
+      "id": "35f6c091-77f8-4cae-9b4f-751688cd9cff",
+      "action": "EVC_OBSERVATION_RECORDED",
+      "actor_id": "23e04761-ea6f-5fdc-a0e8-08b8e35b40e3",
+      "entity_type": "evc_observation",
+      "entity_id": "87abb140-1bab-415d-969d-17f5ef660d9d",
+      "event_at": "2026-10-30T07:33:29.216594+00:00",
+      "previous_hash": "db6d8478f912c12ae913953908b5062a95515d61264b4bbe416f93d30331f5fa",
+      "event_hash": "059c3e361c44cacb7627072889808996c38bd5c5043a2fb95e45387a30c69d78",
+      "valid": true
+    },
+    {
+      "id": "9bcca5ea-c3a5-4369-a0c0-4ede9ac31b92",
+      "action": "MEETING_RECORD_DRAFT_GENERATED",
+      "actor_id": "23e04761-ea6f-5fdc-a0e8-08b8e35b40e3",
+      "entity_type": "meeting_record_version",
+      "entity_id": "4902a6bc-1da3-4150-837a-186a15ca6ecd",
+      "event_at": "2026-10-30T07:33:58.656294+00:00",
+      "previous_hash": "059c3e361c44cacb7627072889808996c38bd5c5043a2fb95e45387a30c69d78",
+      "event_hash": "779155aa70b419625be019eea169f13877e01b23f7ed33203c41fd1d3b700be0",
+      "valid": true
+    },
+    {
+      "id": "e7445dfb-5b76-4156-ad21-7d585910b1d7",
+      "action": "MEETING_RECORD_SUBMITTED",
+      "actor_id": "23e04761-ea6f-5fdc-a0e8-08b8e35b40e3",
+      "entity_type": "meeting_record_version",
+      "entity_id": "4902a6bc-1da3-4150-837a-186a15ca6ecd",
+      "event_at": "2026-10-30T07:35:46.650464+00:00",
+      "previous_hash": "779155aa70b419625be019eea169f13877e01b23f7ed33203c41fd1d3b700be0",
+      "event_hash": "f8f50afcb9dd324ade0ff6e40373e397806e69fb7a00c908a490644970a875c9",
+      "valid": true
+    },
+    {
+      "id": "36b8c033-1ee2-46b9-8d04-857b2504d78e",
+      "action": "MEETING_RECORD_APPROVED",
+      "actor_id": "23e04761-ea6f-5fdc-a0e8-08b8e35b40e3",
+      "entity_type": "evc_report",
+      "entity_id": "d3b8af92-7e0c-42be-b962-ab5351d38d51",
+      "event_at": "2026-10-30T07:36:05.071495+00:00",
+      "previous_hash": "f8f50afcb9dd324ade0ff6e40373e397806e69fb7a00c908a490644970a875c9",
+      "event_hash": "1ae3b880490c432088a7d8fc6b2399345f241ba47719751e55cf78432a8dd4c1",
+      "valid": true
+    },
+    {
+      "id": "0f9ea1c5-c574-458f-aef2-9feea7aa8cfc",
+      "action": "STATUTORY_DECISION_RECORDED",
+      "actor_id": "23e04761-ea6f-5fdc-a0e8-08b8e35b40e3",
+      "entity_type": "approval_decision",
+      "entity_id": "15fac671-dc9c-45c1-a3a7-c8ebbdfb6ea9",
+      "event_at": "2026-10-30T07:42:38.188644+00:00",
+      "previous_hash": "1ae3b880490c432088a7d8fc6b2399345f241ba47719751e55cf78432a8dd4c1",
+      "event_hash": "cf7aa0a655aa7bab6c3f6b2e7408afab68b7aa831cbb986970b1f3d97ebcdc5e",
+      "valid": true
+    },
+    {
+      "id": "27da5445-da68-452e-958a-1511f1b8ab0d",
+      "action": "EVIDENCE_SUBMITTED",
+      "actor_id": "141ddc58-1483-5bf5-adf3-308953de2da3",
+      "entity_type": "evidence_submission",
+      "entity_id": "79d3ad19-355c-4b1b-917c-d2afa0c7a4c6",
+      "event_at": "2026-10-30T08:08:40.297615+00:00",
+      "previous_hash": "cf7aa0a655aa7bab6c3f6b2e7408afab68b7aa831cbb986970b1f3d97ebcdc5e",
+      "event_hash": "83ddbbb4adaaf56ed762ec99dacf190863ee702ddf946a7ee99089aa793ba247",
+      "valid": true
+    },
+    {
+      "id": "a17da24f-7fa7-4737-960d-ce95ec16bf9f",
+      "action": "EVIDENCE_VERIFIED",
+      "actor_id": "1790ff42-f9a4-5866-bd57-c3077df17810",
+      "entity_type": "compliance_verification",
+      "entity_id": "559ba2e9-4c99-40a0-b5f3-77dd196db9ce",
+      "event_at": "2026-10-30T08:20:54.211159+00:00",
+      "previous_hash": "83ddbbb4adaaf56ed762ec99dacf190863ee702ddf946a7ee99089aa793ba247",
+      "event_hash": "2b89f85828c869e58f421cbb666ea254ae686a8e41433af9501bd4ef0f6f7dc4",
+      "valid": true
+    },
+    {
+      "id": "ebe8ba83-a133-43b3-a500-2e32a31574b7",
+      "action": "REPORT_RUN_COMPLETED",
+      "actor_id": "3f9e61f1-9586-5735-bce2-2e83d28d9749",
+      "entity_type": "report_run",
+      "entity_id": "930229f5-b786-4592-93b7-6c63833bea7a",
+      "event_at": "2026-10-30T08:24:37.247394+00:00",
+      "previous_hash": "2b89f85828c869e58f421cbb666ea254ae686a8e41433af9501bd4ef0f6f7dc4",
+      "event_hash": "e5330c0cfb85b89d34fe34fa0409096d56c15628f04e1bbffe1ecf0f53b4b767",
+      "valid": true
+    },
+    {
+      "id": "e3dea8a6-d118-4f8a-a311-a1064997e775",
+      "action": "REPORT_RUN_COMPLETED",
+      "actor_id": "3f9e61f1-9586-5735-bce2-2e83d28d9749",
+      "entity_type": "report_run",
+      "entity_id": "ec90bd8f-fc7d-4dfe-b0c8-576310f60022",
+      "event_at": "2026-10-30T08:58:47.408926+00:00",
+      "previous_hash": "e5330c0cfb85b89d34fe34fa0409096d56c15628f04e1bbffe1ecf0f53b4b767",
+      "event_hash": "68fb5133f2a974f52088fa53d128d429f0c682bd64cc6fe7b4188445c309bb5a",
+      "valid": true
+    }
+  ]
+}

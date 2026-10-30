@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:demo": "node scripts/build-static-demo.cjs",
+    "preview:demo": "node scripts/serve-static-demo.cjs",
     "start": "next start",
     "lint": "eslint",
     "test": "node --test tests/portal-scope.test.mjs"

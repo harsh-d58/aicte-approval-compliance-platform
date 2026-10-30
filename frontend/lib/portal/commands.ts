@@ -1,6 +1,6 @@
 import type { PortalCollections, Role, User, ApplicationStatus, Configuration, ReportCode } from "./types";
 import { demoNow, scopedSnapshot } from "./view-models";
-export type CommandKind = "document.verify" | "institution.import" | "attribute.verify" | "renewal.start" | "actionitem.save" | "actionitem.complete" | "application.migrate" | "institution.save" | "campus.save" | "attribute.save" | "application.save" | "application.submit" | "application.assign" | "application.advance" | "application.cancel" | "application.reopen" | "deficiency.issue" | "deficiency.respond" | "deficiency.resolve" | "decision.record" | "document.save" | "document.check" | "document.review" | "renewal.submit" | "renewal.verify" | "committee.save" | "availability.save" | "visit.recommend" | "visit.confirm" | "visit.postpone" | "visit.cancel" | "visit.complete" | "invitation.respond" | "observation.save" | "record.generate" | "record.save" | "record.review" | "record.approve" | "record.changes" | "condition.create" | "evidence.submit" | "evidence.verify" | "condition.close" | "condition.reopen" | "notification.retry" | "notification.read" | "escalation.resolve" | "workflow.save" | "workflow.publish" | "config.save" | "config.publish" | "user.assignment" | "user.status" | "integration.test" | "integration.disable" | "job.retry" | "job.process" | "report.create" | "report.complete";
+export type CommandKind = "document.verify" | "institution.import" | "attribute.verify" | "renewal.start" | "actionitem.save" | "actionitem.complete" | "application.migrate" | "institution.save" | "campus.save" | "attribute.save" | "application.save" | "application.submit" | "application.assign" | "application.advance" | "application.cancel" | "application.reopen" | "deficiency.issue" | "deficiency.respond" | "deficiency.resolve" | "decision.record" | "document.save" | "document.check" | "document.review" | "renewal.submit" | "renewal.verify" | "committee.save" | "availability.save" | "visit.recommend" | "visit.confirm" | "visit.postpone" | "visit.cancel" | "visit.complete" | "invitation.respond" | "observation.save" | "record.generate" | "record.save" | "record.review" | "record.approve" | "record.changes" | "condition.create" | "condition.update" | "evidence.submit" | "evidence.verify" | "condition.close" | "condition.reopen" | "notification.retry" | "notification.read" | "escalation.resolve" | "workflow.save" | "workflow.publish" | "config.save" | "config.publish" | "user.assignment" | "user.status" | "integration.test" | "integration.disable" | "job.retry" | "job.process" | "report.create" | "report.complete";
 export interface Command {
     kind: CommandKind;
     id?: string;
@@ -131,7 +131,8 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
         data.tasks.push({ id: uid("task"), applicationId, ownerId, title, dueAt, href, status: "PENDING" }); };
     const finishTasks = (appId: string, ownerId: string) => data.tasks.filter(t => t.applicationId === appId && t.ownerId === ownerId).forEach(t => { t.status = "COMPLETED"; });
     const transition = (app: PortalCollections["applications"][number], status: ApplicationStatus, stage: string, reason: string) => { data.stageEvents.push({ id: uid("stage"), applicationId: app.id, at: demoNow, actorId: actor.id, from: app.status, to: status, reason, workflowId: app.workflowId }); app.status = status; app.currentStage = stage; app.stageEnteredAt = demoNow; app.version++; app.nextAction = status === "CLOSED" ? "View historical record" : `Continue ${stage.toLowerCase()} action`; };
-    const selectedVersions = (institutionId: string) => { const ids = list("documentVersionIds"); requireValue(ids.length, "Select at least one document version."); requireValue(ids.every(versionId => data.documents.some(d => d.institutionId === institutionId && d.versions.some(v => v.id === versionId && v.scan === "CLEAN"))), "Each version must belong to this institution and pass local validation."); return ids; };
+    const locallyUsable = (v: PortalCollections["documents"][number]["versions"][number]) => v.scan === "CLEAN" || (v.scan === "PENDING" && v.previewText.startsWith("User-selected local file."));
+    const selectedVersions = (institutionId: string) => { const ids = list("documentVersionIds"); requireValue(ids.length, "Select at least one document version."); requireValue(ids.every(versionId => data.documents.some(d => d.institutionId === institutionId && d.versions.some(v => v.id === versionId && locallyUsable(v)))), "Each version must belong to this institution and pass local validation."); return ids; };
     switch (command.kind) {
         case "institution.import": {
             permit("SYSTEM");
@@ -143,7 +144,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
                 campusName: string;
                 city: string;
             }[];
-            requireValue(Array.isArray(rows) && rows.length > 0 && rows.length <= 200, "Import requires 1â€“200 previewed rows.");
+            requireValue(Array.isArray(rows) && rows.length > 0 && rows.length <= 200, "Import requires 1–200 previewed rows.");
             const codes = new Set(data.institutions.map(i => i.code.toLowerCase()));
             for (const row of rows) {
                 requireValue(row.code?.trim() && row.name?.trim() && row.type?.trim() && row.campusName?.trim() && row.city?.trim() && data.regions.some(r => r.id === row.regionId), "Every import row needs valid mapped fields and an existing region.");
@@ -280,7 +281,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             requireValue(input.declaration === true, "Confirm the declaration before submitting.");
             const documents = data.documents.filter(d => d.institutionId === app.institutionId && (!d.applicationId || d.applicationId === app.id));
             const required = ["LEASE", "REGISTRATION"];
-            requireValue(required.every(type => documents.some(d => d.type === type && d.versions.some(v => v.id === d.currentVersionId && v.scan === "CLEAN"))), "Sample route requires locally validated lease and registration documents.");
+            requireValue(required.every(type => documents.some(d => d.type === type && d.versions.some(v => v.id === d.currentVersionId && locallyUsable(v)))), "Sample route requires locally validated lease and registration documents.");
             const workflow = data.workflows.find(w => w.id === app.workflowId)!;
             requireValue(workflow.status === "PUBLISHED", "Workflow is no longer available.");
             app.submittedAt = demoNow;
@@ -453,7 +454,9 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
                 if (outcome === "REJECT")
                     app.closure = { at: demoNow, authorityId: actor.id, reason, reopened: false };
             }
-            data.decisions.push({ id: uid("decision"), applicationId: app.id, type: outcome as "APPROVE" | "REJECT" | "CLOSE", status: "APPROVED", authorityId: actor.id, reason, at: demoNow });
+            const decisionId = uid("decision");
+            data.decisions.push({ id: decisionId, applicationId: app.id, type: outcome as "APPROVE" | "REJECT" | "CLOSE", status: "APPROVED", authorityId: actor.id, reason, at: demoNow });
+            if (outcome === "APPROVE") data.conditions.filter(c=>c.applicationId===app.id && !c.sourceDecisionId).forEach(c=>{c.sourceDecisionId=decisionId;c.version=(c.version??1)+1;});
             notify(app.institutionId, "DECISION_RECORDED", "APPLICATION", app.id);
             break;
         }
@@ -461,11 +464,11 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             const institutionId = text("institutionId");
             institutional(institutionId);
             const type = text("type");
-            requireValue(["LEASE", "REGISTRATION", "SAFETY_CERTIFICATE"].includes(type), "Choose a configured sample document type.");
-            const supportsExpiry = type !== "REGISTRATION";
-            const expiryDate = supportsExpiry ? date("expiryDate") : null;
-            const issuedAt = date("issuedAt");
-            requireValue(!expiryDate || Date.parse(expiryDate) > Date.parse(issuedAt), "Expiry must follow the issue date.");
+            requireValue(["LEASE", "REGISTRATION", "SAFETY_CERTIFICATE"].includes(type) || data.documents.some(d=>d.type===type) || data.configurations.some(c=>c.category==="DOCUMENT_TYPE" && c.values.code===type), "Choose a configured sample document type.");
+            const supportsExpiry = Boolean(data.configurations.find(c=>c.category==="DOCUMENT_TYPE" && c.values.code===type)?.values.supportsExpiry ?? type !== "REGISTRATION");
+            const expiryDate = supportsExpiry && input.expiryDate ? date("expiryDate") : null;
+            const issuedAt = input.issuedAt ? date("issuedAt") : null;
+            requireValue(!expiryDate || !issuedAt || Date.parse(expiryDate) > Date.parse(issuedAt), "Expiry must follow the issue date.");
             const appId = text("applicationId", false);
             if (appId)
                 requireValue(scoped.applications.some(a => a.id === appId && a.institutionId === institutionId), "Application must belong to this institution.");
@@ -476,14 +479,14 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             const mimeType = text("mimeType");
             requireValue(sizeBytes > 0 && sizeBytes <= 10 * 1024 * 1024 && ["application/pdf", "image/png", "image/jpeg"].includes(mimeType), "Choose a PDF, PNG or JPEG within the sample 10 MB limit.");
             const versionId = text("versionId");
-            const newVersion = { id: versionId, number: (document?.versions.length ?? 0) + 1, fileName: text("fileName"), mimeType, sizeBytes, issuedAt, expiryDate, uploadedAt: demoNow, uploadedBy: actor.id, verification: "PENDING" as const, scan: "CLEAN" as const, previewText: "User-selected local file. Local type/size validation complete; malware scanning and issuer verification are not performed by this prototype." };
+            const newVersion = { id: versionId, number: (document?.versions.length ?? 0) + 1, fileName: text("fileName"), mimeType, sizeBytes, issuedAt, expiryDate, uploadedAt: demoNow, uploadedBy: actor.id, verification: "PENDING" as const, scan: "PENDING" as const, previewText: "User-selected local file. Local type/size validation complete; malware scanning and issuer verification are not performed by this prototype." };
             if (document) {
                 document.versions.push(newVersion);
                 document.currentVersionId = versionId;
             }
             else {
                 id = uid("doc");
-                data.documents.push({ id, institutionId, applicationId: appId || null, campusId: null, type, issuer: text("issuer"), reference: text("reference"), supportsExpiry, currentVersionId: versionId, versions: [newVersion] });
+                data.documents.push({ id, institutionId, applicationId: appId || null, campusId: null, type, issuer: text("issuer",false), reference: text("reference",false), supportsExpiry, currentVersionId: versionId, versions: [newVersion] });
             }
             message = "Local file registered. Verification is still pending.";
             break;
@@ -521,7 +524,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             const doc = docById(renewal!.documentId);
             institutional(doc.institutionId);
             const versionId = text("versionId");
-            requireValue(versionId !== renewal!.previousVersionId && doc.versions.some(v => v.id === versionId && v.scan === "CLEAN" && v.number > (doc.versions.find(old=>old.id===renewal!.previousVersionId)?.number??0)), "Choose a newer locally validated version.");
+            requireValue(versionId !== renewal!.previousVersionId && doc.versions.some(v => v.id === versionId && locallyUsable(v) && v.number > (doc.versions.find(old=>old.id===renewal!.previousVersionId)?.number??0)), "Choose a newer locally validated version.");
             renewal!.submittedVersionId = versionId;
             renewal!.status = "SUBMITTED";
             break;
@@ -736,22 +739,32 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
         case "condition.create": {
             permit("REGIONAL");
             const app = appById();
-            requireValue(app.status === "APPROVED" || app.status === "AWAITING_COMPLIANCE", "An approved decision is required.");
+            requireValue(["DECISION_PENDING", "APPROVED", "AWAITING_COMPLIANCE"].includes(app.status), "The case must reach the decision stage first.");
             const decision = data.decisions.find(d => d.applicationId === app.id && d.type === "APPROVE" && d.status === "APPROVED");
-            requireValue(decision, "Approved source decision unavailable.");
             const description = text("description");
             const requirements = text("requirements").split("\n").map(s => s.trim()).filter(Boolean);
             id = uid("condition");
-            data.conditions.push({ id, applicationId: app.id, institutionId: app.institutionId, sourceDecisionId: decision!.id, code: `DEMO-COND-${data.conditions.length + 1}`, description, evidenceRequired: requirements, dueAt: date("dueAt", true), status: "OPEN", reviewerId: "user-compliance", closureReason: null });
-            transition(app, "AWAITING_COMPLIANCE", "COMPLIANCE", "Approval condition created");
+            data.conditions.push({ id, applicationId: app.id, institutionId: app.institutionId, sourceDecisionId: decision?.id ?? "", code: `DEMO-COND-${data.conditions.length + 1}`, description, evidenceRequired: requirements, dueAt: date("dueAt", true), status: "OPEN", reviewerId: "user-compliance", closureReason: null, version:1 });
+            if (decision) transition(app, "AWAITING_COMPLIANCE", "COMPLIANCE", "Approval condition created");
             notify(app.institutionId, "CONDITION_CREATED", "CONDITION", id);
+            break;
+        }
+        case "condition.update": {
+            permit("REGIONAL");
+            const condition=conditionById();
+            requireValue(!condition.sourceDecisionId && appById(condition.applicationId).status==="DECISION_PENDING", "Required evidence can only be edited before approval.");
+            requireValue(command.expectedVersion===undefined || command.expectedVersion===(condition.version??1), "Condition changed; reload first.");
+            text("reason");
+            condition.evidenceRequired=[...new Set(text("requirements").split("\n").map(s=>s.trim()).filter(Boolean))];
+            condition.version=(condition.version??1)+1;
             break;
         }
         case "evidence.submit": {
             const condition = conditionById();
             institutional(condition.institutionId);
-            requireValue(condition.status !== "CLOSED", "Closed conditions cannot accept evidence.");
+            requireValue(!["CLOSED","VERIFIED_COMPLIANT"].includes(condition.status), "Closed or compliant conditions cannot accept evidence.");
             const ids = selectedVersions(condition.institutionId);
+            requireValue(ids.every(versionId=>data.documents.some(d=>(!d.applicationId||d.applicationId===condition.applicationId)&&d.versions.some(v=>v.id===versionId))), "Evidence must belong to this application or institution.");
             const evidenceId = uid("evidence");
             data.evidence.push({ id: evidenceId, conditionId: id, submissionNumber: data.evidence.filter(e => e.conditionId === id).length + 1, submittedAt: demoNow, submittedBy: actor.id, documentVersionIds: ids, responseToVerificationId: data.verifications.find(v => data.evidence.some(e => e.id === v.evidenceId && e.conditionId === id) && v.result === "CLARIFICATION_REQUIRED")?.id ?? null });
             condition.status = "EVIDENCE_SUBMITTED";
@@ -759,15 +772,17 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             break;
         }
         case "evidence.verify": {
-            permit("COMPLIANCE");
+            permit("COMPLIANCE", "REGIONAL");
             const condition = conditionById();
             const evidence = data.evidence.filter(e => e.conditionId === id).sort((a, b) => b.submissionNumber - a.submissionNumber)[0];
             requireValue(evidence && ["EVIDENCE_SUBMITTED", "UNDER_REVIEW"].includes(condition.status), "New evidence must be submitted first.");
+            requireValue(evidence.submittedBy!==actor.id && !data.verifications.some(v=>v.evidenceId===evidence.id), "Latest evidence requires an independent first review.");
             const result = text("result");
             requireValue(["COMPLIANT", "NON_COMPLIANT", "CLARIFICATION_REQUIRED"].includes(result), "Choose a verification result.");
             data.verifications.push({ id: uid("verification"), evidenceId: evidence.id, reviewerId: actor.id, result: result as "COMPLIANT" | "NON_COMPLIANT" | "CLARIFICATION_REQUIRED", comments: text("reason"), at: demoNow });
             notify(condition.institutionId,`EVIDENCE_${result}`,"CONDITION",condition.id);
             condition.status = result === "COMPLIANT" ? "VERIFIED_COMPLIANT" : result === "NON_COMPLIANT" ? "VERIFIED_NON_COMPLIANT" : "CLARIFICATION_REQUIRED";
+            condition.reviewerId=actor.id;
             break;
         }
         case "condition.close":
@@ -775,6 +790,7 @@ export function applyCommand(snapshot: PortalCollections, actor: User, index: nu
             permit("COMPLIANCE", "REGIONAL");
             const condition = conditionById();
             const reason = text("reason");
+            requireValue(appById(condition.applicationId).status!=="CLOSED", "Reopen the application before changing this condition.");
             if (command.kind === "condition.close")
                 requireValue(condition.status === "VERIFIED_COMPLIANT", "Verified compliant evidence is required before closure.");
             else

@@ -1,0 +1,18 @@
+# Separate static demo deployment. Existing live render.yaml remains available.
+services:
+  - type: web
+    name: setu-demo
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build:demo
+    staticPublishPath: frontend/out
+    envVars:
+      - key: NEXT_PUBLIC_PORTAL_MODE
+        value: demo
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+    routes:
+      - type: rewrite
+        source: /portal/*
+        destination: /portal/open/index.html

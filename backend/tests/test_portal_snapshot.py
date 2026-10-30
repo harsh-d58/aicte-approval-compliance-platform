@@ -130,6 +130,19 @@ class PortalSnapshotTests(unittest.TestCase):
         self.assertEqual(projected['responseVersionId'],'version-2')
         self.assertNotIn('response_text', item)
 
+    def test_condition_checklist_reviewer_and_closure_reason_reach_the_dashboard(self):
+        data=self.fixture()
+        condition=data['compliance_conditions'][0]
+        condition.update(status='closed',evidence_requirements=['Attestation','Photographs'])
+        data.setdefault('evidence_submissions',[]).append({'id':'checklist-evidence','compliance_condition_id':condition['id'],'submitted_by':'institution','submitted_at':'2026-10-30T10:00:00Z','submission_number':99})
+        data.setdefault('compliance_verifications',[]).append({'id':'checklist-review','evidence_submission_id':'checklist-evidence','reviewer_user_id':'actor','result':'accepted','comments':'Reviewed evidence','verified_at':'2099-01-01T10:00:00Z'})
+        data.setdefault('audit_events',[]).append({'id':'checklist-closure','actor_id':'actor','action':'COMPLIANCE_CONDITION_CLOSED','entity_type':'compliance_condition','entity_id':condition['id'],'event_at':'2099-01-01T11:00:00Z','reason':'Verified obligation fulfilled','metadata':{},'correlation_id':'test-correlation','event_hash':'fixture'})
+        result=map_snapshot(data,'actor')
+        projected=next(row for row in result['conditions'] if row['id']==condition['id'])
+        self.assertEqual(projected['evidenceRequired'],['Attestation','Photographs'])
+        self.assertEqual(projected['reviewerId'],'actor')
+        self.assertEqual(projected['closureReason'],'Verified obligation fulfilled')
+
 
 if __name__ == "__main__":
     unittest.main()

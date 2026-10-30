@@ -10,7 +10,7 @@
 .workspace :is(a, button, input, select):focus-visible, .authPage :is(a, button, input, select):focus-visible { outline: 3px solid #a65c2a; outline-offset: 4px; }
 .workspace { min-height: 100dvh; background: #f7f8fa; }
 .brand { display: inline-flex; align-items: center; gap: 11px; }
-.brandLogo { width: 43px; height: 43px; object-fit: cover; object-position: left; flex: 0 0 auto; }
+.brandLogo { width: 44px; height: 44px; object-fit: contain; flex: 0 0 auto; }
 .brand strong { display: block; font-size: 16px; line-height: 1.5; letter-spacing: -.4px; }
 .brand small { display: block; font-size: 10px; color: #626477; white-space: nowrap; }
 .sidebar { width: 258px; position: fixed; inset: 0 auto 0 0; background: #fff; border-right: 1px solid var(--line); display: flex; flex-direction: column; z-index: 50; padding: 30px 18px 20px; }

@@ -1,0 +1,78 @@
+{
+  "application_id": "b0ed2753-0bdf-5c0f-86fd-5e11f2c67e9e",
+  "notice_id": "bc654d42-17b3-4d37-b278-8d0e7c1178d2",
+  "demo_recording_only": true,
+  "steps": [
+    {
+      "step": "existing application submitted and notice issued",
+      "result": {
+        "status": "deficiency_returned",
+        "version": 2
+      }
+    },
+    {
+      "step": "phase 03 versioned response persisted",
+      "result": {
+        "status": "responded",
+        "updated_items": [
+          {
+            "id": "91d01ae2-fcce-4991-9b40-0310d2731b49",
+            "deficiency_notice_id": "bc654d42-17b3-4d37-b278-8d0e7c1178d2",
+            "criterion_code": "FIRE_SAFETY_NOC",
+            "description": "Submit updated endorsement from local Fire Service.",
+            "related_document_id": "96be1974-ebf8-47c9-a554-90768dc111ca",
+            "resolution_status": "submitted"
+          }
+        ],
+        "submission_number": 2
+      }
+    },
+    {
+      "step": "phase 04 scrutiny acceptance persisted",
+      "result": {
+        "item": {
+          "id": "91d01ae2-fcce-4991-9b40-0310d2731b49",
+          "deficiency_notice_id": "bc654d42-17b3-4d37-b278-8d0e7c1178d2",
+          "criterion_code": "FIRE_SAFETY_NOC",
+          "description": "Submit updated endorsement from local Fire Service.",
+          "related_document_id": "96be1974-ebf8-47c9-a554-90768dc111ca",
+          "resolution_status": "accepted"
+        },
+        "notice_resolved": true
+      }
+    },
+    {
+      "step": "configured deficiency stage history",
+      "result": {
+        "id": "b0ed2753-0bdf-5c0f-86fd-5e11f2c67e9e",
+        "application_number": "AICTE-APP-2026-000002",
+        "status": "deficiency_returned",
+        "current_stage_instance_id": "39d768ff-556f-4678-a762-b20f717510ff",
+        "updated_at": "2026-10-29T21:31:22.850658+00:00",
+        "version": 4
+      }
+    },
+    {
+      "step": "phase 04 configured EVC referral persisted",
+      "result": {
+        "id": "b0ed2753-0bdf-5c0f-86fd-5e11f2c67e9e",
+        "application_number": "AICTE-APP-2026-000002",
+        "status": "under_review",
+        "current_stage_instance_id": "de359bf9-2693-4a89-ac96-1575e817a3b3",
+        "updated_at": "2026-10-29T21:31:32.542454+00:00",
+        "version": 5
+      }
+    },
+    {
+      "step": "final persisted verification",
+      "result": {
+        "notice_status": "resolved",
+        "item_status": "accepted",
+        "application_status": "under_review",
+        "current_stage": "EVC",
+        "visit_id": "0fdad461-de96-426a-87aa-64800d7b30b4",
+        "history_events": 2
+      }
+    }
+  ]
+}

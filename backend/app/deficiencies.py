@@ -127,7 +127,7 @@ def create_deficiency_notice(
                 created_items = []
                 for item in payload.items:
                     if item.related_document_id:
-                        cur.execute("SELECT d.id FROM public.documents d JOIN public.applications a ON a.institution_id=d.institution_id WHERE d.id=%s AND a.id=%s AND (d.application_id IS NULL OR d.application_id=a.id)", (item.related_document_id, application_id))
+                        cur.execute("SELECT d.id FROM public.documents d JOIN public.applications a ON a.institution_id=d.institution_id WHERE d.id=%s AND a.id=%s", (item.related_document_id, application_id))
                         if not cur.fetchone(): raise HTTPException(422, detail="Related document must belong to this application or institution")
                     cur.execute(
                         "INSERT INTO public.deficiency_items "
@@ -385,7 +385,7 @@ def resolve_deficiency_item(
     correlation_id = getattr(request.state, "correlation_id", None)
     corr_uuid = _to_uuid(correlation_id)
     operation = "deficiency.resolve_item"
-    body_dict = payload.model_dump(mode="json")
+    body_dict = {"item_id": str(item_id), **payload.model_dump(mode="json")}
 
     if idempotency_key:
         try:

@@ -3,10 +3,11 @@ import { OcrTester } from "./OcrTester";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useWorkspace, Page, Panel, Links, Field, ActionForm, ReasonAction, Table, Unavailable, Meta, Search, optionsOf, Link, Badge, s, formatDateTime, humanize } from "./domain-ui";
-import { putFile, download } from "@/lib/portal/files";
+import { putFile, getFile, download } from "@/lib/portal/files";
+import { isDemoMode } from "@/lib/portal/mode";
 import { useLive } from "./LiveProvider";
 import { uid } from "@/lib/portal/commands";
-import { demoNow, formatDate } from "@/lib/portal/view-models";
+import { demoNow, formatDate, safeReturnTo } from "@/lib/portal/view-models";
 import type { DocumentVersion, PortalDocument } from "@/lib/portal/types";
 function FilePreview({ version }: {
     version: DocumentVersion;
@@ -14,21 +15,26 @@ function FilePreview({ version }: {
  const {get, download: fetchFile}=useLive();
  const [blob,setBlob]=useState<Blob>(); const [url,setUrl]=useState(""); const [error,setError]=useState("");
  useEffect(()=>{let active=true;let objectUrl="";setError("");
-  void (async()=>{try {const link=await get<{download_url:string}>(`/document-versions/${version.id}/download-token`);const file=await fetchFile(link.download_url.replace(/^\/api\/v1/,""));if(active){objectUrl=URL.createObjectURL(file.blob);setBlob(file.blob);setUrl(objectUrl);}}catch(cause){if(active)setError(cause instanceof Error?cause.message:"File unavailable.");}})();
+  setBlob(undefined);setUrl("");
+  void (async()=>{try {
+   const blob=isDemoMode ? await getFile(version.id) : await (async()=>{const link=await get<{download_url:string}>(`/document-versions/${version.id}/download-token`);return (await fetchFile(link.download_url.replace(/^\/api\/v1/,""))).blob;})();
+   if(!blob)throw new Error("This sample contains preview metadata only. Upload a local file to preview and download its exact bytes.");
+   if(active){objectUrl=URL.createObjectURL(blob);setBlob(blob);setUrl(objectUrl);}
+  }catch(cause){if(active)setError(cause instanceof Error?cause.message:"File unavailable.");}})();
   return ()=>{active=false;if(objectUrl)URL.revokeObjectURL(objectUrl);};
  },[version.id,get,fetchFile]);
  return <><p className={s.muted}>{version.fileName} · {Math.ceil(version.sizeBytes/1024)} KB · v{version.number}</p>{url?<><object className={s.preview} data={url} type={version.mimeType} aria-label={`Preview ${version.fileName}`}><p>Use Download file to view this file.</p></object><button className={s.button} onClick={()=>blob&&download(blob,version.fileName)}>Download file</button></>:<div className={s.source}>{version.previewText}<p className={s.muted}>{error || "Loading authorised file…"}</p></div>}</>;
 }
 function Upload({ document }: {
     document?: PortalDocument;
-}) { const { data, router } = useWorkspace(); const [type, setType] = useState(document?.type ?? ""); if (!data)
+}) { const { data, router } = useWorkspace(); const search = useSearchParams(); const [type, setType] = useState(document?.type ?? search.get("type") ?? ""); if (!data)
     return null;
     const kinds = [...new Set([...data.configurations.filter(c=>c.category==="DOCUMENT_TYPE").map(c=>String(c.values.code??"").replace(/^DEMO-/,"")), ...data.documents.map(d=>d.type)])].filter(Boolean);
     const selectedType = type || kinds[0] || "";
     const expiring = document?.supportsExpiry ?? data.configurations.find(c=>c.category==="DOCUMENT_TYPE" && String(c.values.code).replace(/^DEMO-/,"")===selectedType)?.values.supportsExpiry ?? true;
     return <ActionForm kind="document.save" id={document?.id} submit={document ? "Upload new version" : "Register document"} build={async (fd) => { const file = fd.get("file"); if (!(file instanceof File) || !file.size)
     throw new Error("Choose a file."); if (file.size > 10 * 1024 * 1024 || !["application/pdf", "image/png", "image/jpeg"].includes(file.type))
-    throw new Error("Choose a PDF, PNG or JPEG within 10 MB."); const versionId = uid("version"); await putFile(versionId, file); return { versionId, fileName: file.name, mimeType: file.type, sizeBytes: file.size }; }} after={r => router.push(`/portal/documents/${r.id}`)}><div className={s.fields}><Field name="institutionId" label="Institution" value={document?.institutionId} options={data.institutions.map(i => ({ id: i.id, name: i.name }))}/><Field name="applicationId" label="Related application (optional)" required={false} value={document?.applicationId ?? ""} options={data.applications.map(a => ({ id: a.id, name: a.number }))}/><label className={s.field}>Document type<select name="type" value={selectedType} onChange={e => setType(e.target.value)} required>{kinds.filter(t => !document || t === document.type).map(t => <option key={t} value={t}>{humanize(t)}</option>)}</select></label><Field name="issuer" label="Issuer" value={document?.issuer}/><Field name="reference" label="Reference number" value={document?.reference}/><Field name="issuedAt" label="Issue date" type="date"/>{expiring && <Field name="expiryDate" label="Declared expiry date" type="date"/>}<label className={s.field}>Choose file<input name="file" type="file" accept="application/pdf,image/png,image/jpeg" required/><small>PDF, PNG, JPEG · 10 MB maximum · saved to private prototype storage.</small></label></div><p className={s.note}>File type and size are checked locally. The server validates size, content signatures and checksums. Malware scanning and issuer authentication are pending. Verification remains pending after upload.</p></ActionForm>; }
+    throw new Error("Choose a PDF, PNG or JPEG within 10 MB."); const versionId = uid("version"); await putFile(versionId, file); return { versionId, fileName: file.name, mimeType: file.type, sizeBytes: file.size }; }} after={r => router.push(search.get("returnTo") ? safeReturnTo(search.get("returnTo")) : `/portal/documents/${r.id}`)}><div className={s.fields}><Field name="institutionId" label="Institution" value={document?.institutionId ?? search.get("institutionId") ?? ""} options={data.institutions.map(i => ({ id: i.id, name: i.name }))}/><Field name="applicationId" label="Related application (optional)" required={false} value={document?.applicationId ?? search.get("applicationId") ?? ""} options={data.applications.map(a => ({ id: a.id, name: a.number }))}/><label className={s.field}>Document type<select name="type" value={selectedType} onChange={e => setType(e.target.value)} required>{kinds.filter(t => !document || t === document.type).map(t => <option key={t} value={t}>{humanize(t)}</option>)}</select></label><Field name="issuer" label="Issuer" value={document?.issuer}/><Field name="reference" label="Reference number" value={document?.reference}/><Field name="issuedAt" label="Issue date" type="date"/>{expiring && <Field name="expiryDate" label="Declared expiry date" type="date"/>}<label className={s.field}>Choose file<input name="file" type="file" accept="application/pdf,image/png,image/jpeg" required/><small>PDF, PNG, JPEG · 10 MB maximum · saved to this browser in demo mode.</small></label></div><p className={s.note}>File type and size are checked locally. Demo files stay in this browser; live uploads use the server. Malware scanning and issuer authentication are not performed in demo mode. Verification remains pending after upload.</p></ActionForm>; }
 export default function DocumentPages({ mode }: {
     mode: "list" | "new" | "detail" | "check" | "renewals" | "renewal";
 }) {

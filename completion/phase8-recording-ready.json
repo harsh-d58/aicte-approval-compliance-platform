@@ -1,0 +1,36 @@
+{
+  "application_id": "76e9a91b-343a-5d90-8f73-8f96b7b83603",
+  "condition_id": "0def79df-6df3-401c-ba69-e8a9a1d93c9c",
+  "visit_id": "5a4f390a-0fd4-5f7f-b217-c1139f32fc82",
+  "demo_recording_only": true,
+  "final_decision_recorded_by_setup": false,
+  "steps": [
+    {
+      "step": "one completed demonstration visit persisted; condition and final decision untouched",
+      "result": {
+        "application_version": 1
+      }
+    },
+    {
+      "step": "submitted demonstration source saved through scoped API",
+      "result": {
+        "source_id": "87abb140-1bab-415d-969d-17f5ef660d9d"
+      }
+    },
+    {
+      "step": "source-backed report reviewed and approved through normal API",
+      "result": {
+        "report_id": "d3b8af92-7e0c-42be-b962-ab5351d38d51",
+        "version_id": "4902a6bc-1da3-4150-837a-186a15ca6ecd"
+      }
+    },
+    {
+      "step": "live snapshot ready for manual APPROVE; undertaking remains open and no final decision exists",
+      "result": {
+        "application_status": "DECISION_PENDING",
+        "condition_status": "OPEN",
+        "report_id": "d3b8af92-7e0c-42be-b962-ab5351d38d51"
+      }
+    }
+  ]
+}

@@ -16,6 +16,7 @@ from .idempotency import IdempotencyConflict, IdempotencyExpired, find_result, s
 from .outbox import enqueue
 from .transactions import UnsafeWriteConnection, write_transaction
 from .users import _to_uuid
+from .decision_lifecycle import decision_outcome, check_decision_prerequisites
 
 
 router = APIRouter(tags=["decisions"])
@@ -49,13 +50,16 @@ def record_statutory_decision(
     correlation_id = getattr(request.state, "correlation_id", None)
     corr_uuid = _to_uuid(correlation_id)
     operation = "application.record_decision"
-    body_dict = payload.model_dump(mode="json")
+    decision_type, outcome = decision_outcome(payload.decision_type, payload.decision_status)
+    body_dict = {"application_id": str(application_id), **payload.model_dump(mode="json")}
 
     expected_version = payload.expected_version
     if if_match is not None:
         try:
             expected_version = int(if_match.strip('"'))
         except ValueError:
+            raise HTTPException(status_code=400)
+        if expected_version < 1:
             raise HTTPException(status_code=400)
 
     if idempotency_key:
@@ -80,19 +84,26 @@ def record_statutory_decision(
                 # 1. Lock and check version
                 try:
                     lock_versioned(cur, table="applications", record_id=application_id, expected_version=expected_version)
-                    next_version = bump_version(cur, table="applications", record_id=application_id, expected_version=expected_version)
                 except StaleVersion:
                     raise HTTPException(status_code=412)
                 except RecordMissing:
                     raise HTTPException(status_code=404)
 
                 cur.execute(
-                    "SELECT id, application_number, status FROM public.applications WHERE id = %s",
+                    "SELECT a.id,a.application_number,a.status,a.workflow_definition_id,a.institution_id,s.stage_type "
+                    "FROM public.applications a LEFT JOIN public.application_stage_instances si ON si.id=a.current_stage_instance_id "
+                    "LEFT JOIN public.workflow_stages s ON s.id=si.workflow_stage_id WHERE a.id = %s",
                     (application_id,),
                 )
                 app = cur.fetchone()
-                if app["status"] in ("approved", "rejected", "closed", "withdrawn"):
-                    raise HTTPException(status_code=409)
+                if not app:
+                    raise HTTPException(404)
+                check_decision_prerequisites(cur, app, decision_type, outcome)
+                if payload.record_document_id:
+                    cur.execute('SELECT id FROM public.documents WHERE id=%s AND institution_id=%s AND (application_id IS NULL OR application_id=%s)', (payload.record_document_id, app['institution_id'], application_id))
+                    if not cur.fetchone():
+                        raise HTTPException(422, detail='Decision document must belong to this application or institution')
+                next_version = bump_version(cur, table="applications", record_id=application_id, expected_version=expected_version)
 
                 now = datetime.now(timezone.utc)
 
@@ -102,18 +113,18 @@ def record_statutory_decision(
                     "(application_id, decision_type, decision_status, decision_authority, decision_at, reason, record_document_id, created_at, created_by) "
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) "
                     "RETURNING id, application_id, decision_type, decision_status, decision_authority, decision_at, reason, record_document_id, created_at",
-                    (application_id, payload.decision_type, payload.decision_status, payload.decision_authority, now, payload.reason, payload.record_document_id, now, caller_uuid),
+                    (application_id, decision_type, payload.decision_status, payload.decision_authority, now, payload.reason, payload.record_document_id, now, caller_uuid),
                 )
                 decision = cur.fetchone()
                 decision_id = decision["id"]
 
                 # 3. Update application status if final
-                if payload.decision_status in ("approved", "rejected", "withdrawn"):
+                if outcome:
                     cur.execute(
                         "UPDATE public.applications "
                         "SET status = %s, closed_at = %s, updated_at = %s, updated_by = %s "
                         "WHERE id = %s",
-                        (payload.decision_status, None if payload.decision_status == "approved" else now, now, caller_uuid, application_id),
+                        (outcome, None if outcome == "approved" else now, now, caller_uuid, application_id),
                     )
                 else:
                     cur.execute(
@@ -122,11 +133,17 @@ def record_statutory_decision(
                         "WHERE id = %s",
                         (now, caller_uuid, application_id),
                     )
+                if outcome == 'approved':
+                    cur.execute('UPDATE public.compliance_conditions SET source_approval_id=%s,updated_at=%s,updated_by=%s,version=version+1 WHERE application_id=%s AND source_approval_id IS NULL', (decision_id, now, caller_uuid, application_id))
+                if outcome in ('closed', 'rejected', 'withdrawn'):
+                    cur.execute("UPDATE public.application_stage_instances SET status='completed',completed_at=%s WHERE id=(SELECT current_stage_instance_id FROM public.applications WHERE id=%s) AND status<>'completed'", (now, application_id))
+                    cur.execute("UPDATE public.assignments SET status='completed' WHERE application_id=%s AND status='active'", (application_id,))
 
                 # 4. Append audit event
                 audit_meta = {
                     "application_number": app["application_number"],
-                    "decision_type": payload.decision_type,
+                    "decision_type": decision_type,
+                    "application_status": outcome or app['status'],
                     "decision_status": payload.decision_status,
                     "decision_authority": payload.decision_authority,
                     "old_version": expected_version,
@@ -135,7 +152,7 @@ def record_statutory_decision(
                 append_event(
                     cur,
                     actor_id=caller_uuid,
-                    action="STATUTORY_DECISION_RECORDED",
+                    action="APPLICATION_CLOSED" if outcome == 'closed' else "STATUTORY_DECISION_RECORDED",
                     entity_type="approval_decision",
                     entity_id=decision_id,
                     correlation_id=corr_uuid,
@@ -146,7 +163,7 @@ def record_statutory_decision(
                 # 5. Enqueue outbox event
                 enqueue(
                     cur,
-                    event_type="APPLICATION_DECIDED",
+                    event_type="APPLICATION_CLOSED" if outcome == 'closed' else "APPLICATION_DECIDED",
                     entity_type="application",
                     entity_id=application_id,
                     entity_version=next_version,
@@ -156,6 +173,7 @@ def record_statutory_decision(
 
                 decision_dict = _serialize(decision)
                 decision_dict["application_version"] = next_version
+                decision_dict["application_status"] = outcome or app['status']
 
                 if idempotency_key:
                     store_result(

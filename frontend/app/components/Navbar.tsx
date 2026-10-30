@@ -31,12 +31,21 @@ export default function Navbar() {
     >
       <div className={`container ${styles.inner}`}>
         {/* ── Logo Group ── */}
-        <a href="#home" className={styles.logoGroup} aria-label="AICTE Portal Home">
+        <a href="#home" className={styles.logoGroup} aria-label="SETU Portal Home">
+          <Image
+            src="/setu_logo.png"
+            alt="SETU Logo"
+            width={64}
+            height={44}
+            unoptimized
+            className={styles.setuLogo}
+            priority
+          />
           <Image
             src="/aicte_logo.png"
             alt="AICTE Logo"
-            width={380}
-            height={73}
+            width={44}
+            height={44}
             unoptimized
             className={styles.logoImg}
             priority
@@ -49,10 +58,6 @@ export default function Navbar() {
             className={styles.moeLogo}
             priority
           />
-          <div className={styles.logoText}>
-            <span className={styles.logoTitle}>AICTE Portal</span>
-            <span className={styles.logoSub}>Approval &amp; Compliance Platform</span>
-          </div>
         </a>
 
         {/* ── Desktop Nav ── */}

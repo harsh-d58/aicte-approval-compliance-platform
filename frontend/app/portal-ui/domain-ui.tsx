@@ -14,7 +14,7 @@ export function Page({ title, description, children, actions }: {
     description: string;
     children: React.ReactNode;
     actions?: React.ReactNode;
-}) { return <div className={s.page}><PageHeading eyebrow="APPROVAL & COMPLIANCE · DEMONSTRATION" title={title} description={description} action={actions}/>{children}</div>; }
+}) { return <div className={s.page}><PageHeading eyebrow="APPROVAL & COMPLIANCE" title={title} description={description} action={actions}/>{children}</div>; }
 export function Panel({ title, children }: {
     title?: string;
     children: React.ReactNode;
@@ -131,9 +131,10 @@ export function Search({ value, onChange, label = "Search records" }: {
     onChange: (v: string) => void;
     label?: string;
 }) { return <label className={s.field}>{label}<input value={value} onChange={e => onChange(e.target.value)} type="search"/></label>; }
-export function Versions({ name = "versionIds", institutionId }: {
+export function Versions({ name = "versionIds", institutionId, applicationId }: {
     name?: string;
     institutionId?: string;
-}) { const { data } = useDemo(); return <><p className={s.muted}>Select the exact evidence versions. Historical versions remain attached to earlier submissions.</p><Checks name={name} options={data?.documents.filter(d => !institutionId || d.institutionId === institutionId).flatMap(d => d.versions.map(v => ({ id: v.id, name: `${humanize(d.type)} · v${v.number} · ${v.fileName} · ${humanize(v.verification)}` }))) ?? []}/></>; }
+    applicationId?: string;
+}) { const { data } = useDemo(); return <><p className={s.muted}>Select the exact evidence versions. Historical versions remain attached to earlier submissions.</p><Checks name={name} options={data?.documents.filter(d => (!institutionId || d.institutionId === institutionId) && (!applicationId || !d.applicationId || d.applicationId === applicationId)).flatMap(d => d.versions.filter(v=>v.verification!=="REJECTED").map(v => ({ id: v.id, name: `${humanize(d.type)} · v${v.number} · ${v.fileName} · ${humanize(v.verification)}` }))) ?? []}/></>; }
 export const valuesOf = (fd: FormData, key: string) => fd.getAll(key).map(String);
 export const optionsOf = (values: string[]) => values.map(id => ({ id, name: humanize(id) }));
